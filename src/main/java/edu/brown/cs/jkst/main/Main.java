@@ -8,6 +8,8 @@ import java.util.Map;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+
+import edu.brown.cs.jkst.movies.MovieDatabase;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import spark.ExceptionHandler;
@@ -60,6 +62,12 @@ public final class Main {
     if (options.has("gui")) {
       runSparkServer((int) options.valueOf("port"));
     }
+    
+    Repl r = new Repl();
+    MovieDatabase md = new MovieDatabase();
+    md.registerAllCommands(r.cm);
+
+    r.read();
 
     System.exit(-1);
   }
