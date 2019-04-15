@@ -5,9 +5,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import com.google.gson.Gson;
-
+import edu.brown.cs.jkst.handler.Handler;
 import edu.brown.cs.jkst.movies.MovieDatabase;
+import edu.brown.cs.jkst.repl.Repl;
 import freemarker.template.Configuration;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
@@ -23,7 +23,6 @@ import spark.template.freemarker.FreeMarkerEngine;
 public final class Main {
 
   private static final int DEFAULT_PORT = 4567;
-  private static final Gson GSON = new Gson();
 
   /**
    * The initial method called when execution begins.
@@ -58,7 +57,7 @@ public final class Main {
 
     Repl r = new Repl();
     MovieDatabase md = new MovieDatabase();
-    md.registerAllCommands(r.cm);
+    md.registerAllCommands(r.CM);
 
     r.read();
 
@@ -86,7 +85,9 @@ public final class Main {
     FreeMarkerEngine freeMarker = createEngine();
 
     // Setup Spark Routes
-
+    Spark.get("/filmdb", new Handler.FrontHandler(), freeMarker);
+    Spark.post("/suggest", new Handler.SearchSuggestHandler());
+    Spark.get("/filmdb/results", new Handler.SearchSubmitHandler(), freeMarker);
   }
 
   /**

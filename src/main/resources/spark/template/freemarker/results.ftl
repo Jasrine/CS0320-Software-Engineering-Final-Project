@@ -28,9 +28,8 @@
     </style>
 </head>
 <body>
-    <div class="index" id="index">
-        Enter a query!<br>
-        <input type="text" id="search" name="search">
+    <div class="row">
+        Here is the results page!
     </div>
 <script src="js/jquery-2.1.1.js"></script>
 <script src="js/jquery-3.1.1.js"></script>
