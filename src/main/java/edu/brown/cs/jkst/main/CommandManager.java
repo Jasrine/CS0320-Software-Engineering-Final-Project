@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import edu.brown.cs.jkst.movies.SelectCommand;
+import edu.brown.cs.jkst.query.FilmQuery;
 import edu.brown.cs.jkst.query.SearchCommand;
 import edu.brown.cs.jkst.suggest.SuggestCommand;
 
@@ -22,7 +23,7 @@ public class CommandManager {
    */
   public CommandManager() {
     this.commands = new HashMap<String, Command>();
-    // FilmQuery.INSTANCE.createConnection();
+    FilmQuery.INSTANCE.createConnection();
     this.commands.put("suggest", SuggestCommand.INSTANCE);
     this.commands.put("select", SelectCommand.INSTANCE);
     this.commands.put("search", SearchCommand.INSTANCE);

@@ -1,10 +1,12 @@
 package edu.brown.cs.jkst.handler;
 
+import java.util.List;
 import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 
+import edu.brown.cs.jkst.query.FilmQuery;
 import edu.brown.cs.jkst.suggest.SuggestCommand;
 import spark.ModelAndView;
 import spark.QueryParamsMap;
@@ -23,18 +25,6 @@ public final class Handler {
   }
 
   /**
-   * Handle requests to the front page of our application.
-   */
-  public static class FrontHandler implements TemplateViewRoute {
-    @Override
-    public ModelAndView handle(Request req, Response res) {
-      Map<String, Object> variables = ImmutableMap.of("title",
-          "Film suggestions");
-      return new ModelAndView(variables, "main.ftl");
-    }
-  }
-
-  /**
    * Handles requests in the search bar on the front page of our application so
    * that this can be autocorrected.
    */
@@ -43,9 +33,10 @@ public final class Handler {
     public String handle(Request req, Response res) {
       QueryParamsMap qm = req.queryMap();
       String search = qm.value("search");
-      SuggestCommand.INSTANCE.getSuggestions(search);
+      String suggestions = SuggestCommand.INSTANCE.getSuggestions(search);
+      List<String> regions = FilmQuery.getRegions();
       Map<String, Object> variables = ImmutableMap.of("title",
-          "Film suggestions");
+          "Film suggestions", "suggestions", suggestions, "regions", regions);
       return GSON.toJson(variables);
     }
   }
@@ -58,7 +49,7 @@ public final class Handler {
     @Override
     public ModelAndView handle(Request req, Response res) {
       Map<String, Object> variables = ImmutableMap.of("title",
-          "Film suggestions");
+          "Film suggestions", "results", "results");
       return new ModelAndView(variables, "results.ftl");
     }
   }

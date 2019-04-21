@@ -12,6 +12,7 @@ public final class SearchCommand implements Command {
 
   @Override
   public void execute(String line, PrintWriter pw, Boolean repl) {
+    // returns films similar to the selected film
     pw.println("No results found.");
   }
 }

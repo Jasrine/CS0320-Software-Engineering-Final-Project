@@ -14,11 +14,11 @@ public final class SuggestCommand implements Command {
 
   @Override
   public void execute(String line, PrintWriter pw, Boolean repl) {
-    Set<String> suggestions = FilmQuery.INSTANCE.findSuggestion(line);
+    String suggestions = FilmQuery.INSTANCE.findSuggestion(line);
     if (repl) {
-      pw.println(displaySuggestions(suggestions));
+      pw.println(suggestions);
     } else {
-      pw.print("sent stuff to handler");
+      pw.println("sent suggest stuff to handler");
     }
   }
 
@@ -29,7 +29,7 @@ public final class SuggestCommand implements Command {
    *          String which we want to pass into the trie
    * @return Set of strings which are reasonable suggestions for the user.
    */
-  public Set<String> getSuggestions(String search) {
+  public String getSuggestions(String search) {
     return FilmQuery.INSTANCE.findSuggestion(search);
   }
 

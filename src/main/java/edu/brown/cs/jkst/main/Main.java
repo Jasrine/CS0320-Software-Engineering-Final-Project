@@ -6,6 +6,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import edu.brown.cs.jkst.handler.Handler;
+import edu.brown.cs.jkst.handler.InitHandlers;
 import edu.brown.cs.jkst.movies.MovieDatabase;
 import edu.brown.cs.jkst.repl.Repl;
 import freemarker.template.Configuration;
@@ -85,7 +86,8 @@ public final class Main {
     FreeMarkerEngine freeMarker = createEngine();
 
     // Setup Spark Routes
-    Spark.get("/filmdb", new Handler.FrontHandler(), freeMarker);
+    Spark.get("/filmdb", new InitHandlers.FrontHandler(), freeMarker);
+    Spark.post("/init", new InitHandlers.FrontInitHandler());
     Spark.post("/suggest", new Handler.SearchSuggestHandler());
     Spark.get("/filmdb/results", new Handler.SearchSubmitHandler(), freeMarker);
   }
