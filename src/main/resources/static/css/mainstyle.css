@@ -1,0 +1,13 @@
+.column1 {
+    width: 65%;
+    float: left;
+}
+
+.column2 {
+    width: 100%;
+    padding-left: 65%;
+}
+
+.row:after{
+    height: 10px;
+}
