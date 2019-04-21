@@ -8,12 +8,10 @@ import com.google.gson.Gson;
 
 import edu.brown.cs.jkst.query.FilmQuery;
 import edu.brown.cs.jkst.suggest.SuggestCommand;
-import spark.ModelAndView;
 import spark.QueryParamsMap;
 import spark.Request;
 import spark.Response;
 import spark.Route;
-import spark.TemplateViewRoute;
 
 /**
  * contains handlers for displaying pages and handling requests.
@@ -35,8 +33,11 @@ public final class Handler {
       String search = qm.value("search");
       String suggestions = SuggestCommand.INSTANCE.getSuggestions(search);
       List<String> regions = FilmQuery.getRegions();
+      List<String> genres = FilmQuery.getGenres();
+      List<String> decades = FilmQuery.getDecades();
       Map<String, Object> variables = ImmutableMap.of("title",
-          "Film suggestions", "suggestions", suggestions, "regions", regions);
+          "Film suggestions", "suggestions", suggestions, "regions", regions,
+          "genres", genres, "decades", decades);
       return GSON.toJson(variables);
     }
   }
@@ -45,12 +46,12 @@ public final class Handler {
    * Handles submit requests in the search bar on the front page of our
    * application.
    */
-  public static class SearchSubmitHandler implements TemplateViewRoute {
+  public static class SearchSubmitHandler implements Route {
     @Override
-    public ModelAndView handle(Request req, Response res) {
+    public String handle(Request req, Response res) {
       Map<String, Object> variables = ImmutableMap.of("title",
           "Film suggestions", "results", "results");
-      return new ModelAndView(variables, "results.ftl");
+      return GSON.toJson(variables);
     }
   }
 }

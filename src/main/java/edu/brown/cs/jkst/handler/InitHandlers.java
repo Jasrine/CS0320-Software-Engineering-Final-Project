@@ -30,9 +30,11 @@ public final class InitHandlers {
     @Override
     public String handle(Request req, Response res) {
       List<String> regions = FilmQuery.getRegions();
+      List<String> genres = FilmQuery.getGenres();
+      List<String> decades = FilmQuery.getDecades();
       Map<String, Object> variables = ImmutableMap.of("title",
           "Film suggestions", "suggestions", "\n", "regions", regions,
-          "decades", regions);
+          "decades", decades, "genres", genres);
       return GSON.toJson(variables);
     }
   }
@@ -44,9 +46,11 @@ public final class InitHandlers {
     @Override
     public ModelAndView handle(Request req, Response res) {
       List<String> regions = FilmQuery.getRegions();
+      List<String> genres = FilmQuery.getGenres();
+      List<String> decades = FilmQuery.getDecades();
       Map<String, Object> variables = ImmutableMap.of("title",
           "Film suggestions", "suggestions", "\n", "regions", regions,
-          "decades", regions);
+          "decades", decades, "genres", genres);
       return new ModelAndView(variables, "main.ftl");
     }
   }
