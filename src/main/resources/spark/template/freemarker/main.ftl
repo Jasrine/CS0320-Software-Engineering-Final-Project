@@ -57,8 +57,8 @@
         .ui-widget-content .selected {
             color: #9932CC
         }
-        .ui-widget-content .active {
-            color: #BA55D3
+        .ui-widget-content:active {
+            color: #9932CC
         }
 
         #selectable li .hover {
@@ -72,8 +72,11 @@
 <body>
     <div class="outer" id="outer">
         <div class="index" id="index">
+
             Enter a possible film title:<br>
             <input type="text" id="search" name="search"><br>
+            <ol name="suggestions" id="suggestions"></ol>
+
             From a year: <select name="decades" id="decades">
                 <option value="0">Select a decade.</option>
             </select><br>
@@ -93,18 +96,13 @@
             </select><br>
             Here are suggestions:<br>
 
-            <ol name="suggestions" id="suggestions">
-<!--                 <li class="ui-widget-content">Item 1</li>
-                <li class="ui-widget-content">Item 2</li>
-                <li class="ui-widget-content">Item 3</li>
-                <li class="ui-widget-content">Item 4</li>
-                <li class="ui-widget-content">Item 5</li> -->
+            <ol name="searchResults" id="searchResults">
             </ol>
             <!-- <select name="suggestions" id="suggestions" size="5">
             </select>
      --><!-- 
             <textarea name="suggestions" id="suggestions"></textarea> -->
-
+            <p style="white-space: nowrap;"> <a href="/contact">Contact us</a> <a href="/about">About us</a> <a href="/faq">Anticipated Questions</a></p>
         </div>
     </div>
     <script src="js/jquery-2.1.1.js"></script>

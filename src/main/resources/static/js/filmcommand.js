@@ -57,12 +57,19 @@ function addOptions(res, sel, counter) {
 // Global references
 const $searchQuery = $("#search");
 const $suggestions = $("#suggestions");
+const $searchResults = $("#searchResults");
 const regions = document.getElementById("regions");
 const decades = document.getElementById("decades");
 const genres = document.getElementById("genres");
 
-$suggestions.children.onclick = ({
-
+document.getElementById("suggestions").addEventListener("click", function(e) {
+	console.log(e);
+  if (e.target && e.target.matches("li.ui-widget-content")) {
+  	console.log("foo");
+    //e.target.style.color = "#9932CC";
+    $searchQuery.value = e.target.innerHTML;
+    $searchQuery.val(e.target.innerHTML);
+  }
 });
 
 $(document).ready(() => {
@@ -97,8 +104,8 @@ $(document).ready(() => {
 					const responseObject = JSON.parse(responseJSON);
 					console.log(responseObject);
 
-					for (let j = $suggestions[0].children.length-1; j >= 0; j--) {
-						$suggestions[0].removeChild($suggestions[0].children[j]);
+					for (let j = $searchResults[0].children.length-1; j >= 0; j--) {
+						$searchResults[0].removeChild($searchResults[0].children[j]);
 					}
 					responseObject.results.forEach(suggestion => {
 						let f = new Film(suggestion.id, suggestion.filmName, suggestion.director, suggestion.genres,
@@ -108,7 +115,7 @@ $(document).ready(() => {
 
 						console.log(suggestion);
 						const $node = $("<li class=\"ui-widget-content\">").text(f.toString());
-						$suggestions.append($node);
+						$searchResults.append($node);
 					});
 				});
 			} else {

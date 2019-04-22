@@ -18,6 +18,18 @@
   text-align: center;
 }
 
+a:link {
+    color: #E6E6FA;
+}
+
+a:hover {
+    color: #FFE4E1;
+}
+
+a:active {
+    color: #FFB6C1;
+}
+
 .selected {
   color: #BA55D3;
 }

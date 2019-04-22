@@ -18,6 +18,7 @@ import edu.brown.cs.jkst.main.CommandManager.Command;
 public final class SearchCommand implements Command {
   public static final SearchCommand INSTANCE = new SearchCommand();
   private static final int DEC = 10;
+  private static final int NUM_RESULTS = 100;
 
   @Override
   public void execute(String line, PrintWriter pw, Boolean repl) {
@@ -157,7 +158,7 @@ public final class SearchCommand implements Command {
         // Set<Movie> poss = new HashSet<Movie>();
 
         int numResults = 0;
-        while (rs.next() && numResults < 100) {
+        while (rs.next() && numResults < NUM_RESULTS) {
           String id = rs.getString(1);
           List<String> regions = Arrays.asList(rs.getString(2).split(","));
           String filmName = rs.getString(3);
