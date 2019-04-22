@@ -90,7 +90,7 @@ public final class FilmQuery {
   public int createConnection() {
     try {
       Class.forName("org.sqlite.JDBC");
-      conn = DriverManager.getConnection("jdbc:sqlite:data/imdb4.db");
+      conn = DriverManager.getConnection("jdbc:sqlite:data/imdb5.db");
       Statement stat = conn.createStatement();
       stat.executeUpdate("PRAGMA foreign_keys = ON;");
 
@@ -176,17 +176,27 @@ public final class FilmQuery {
    */
   public void addAllRegions() {
     try {
-      String q = "SELECT DISTINCT region FROM akas;";
+      String q = "SELECT DISTINCT region FROM titles;";
       PreparedStatement prep = conn.prepareStatement(q);
       ResultSet rs = prep.executeQuery();
+
+      Set<String> regionSet = new HashSet<String>();
       while (rs.next()) {
         if (rs.getString(1) != null) {
-          regions.add(rs.getString(1));
+          String txt = rs.getString(1);
+          for (String piece : txt.split(",")) {
+            regionSet.add(piece);
+          }
+          // regions.add(rs.getString(1));
           System.out.println(rs.getString(1));
         }
       }
       rs.close();
       prep.close();
+
+      for (String piece : regionSet) {
+        regions.add(piece);
+      }
       Collections.sort(regions);
     } catch (SQLException e) {
       System.out.println("ERROR: SQL Exception caught in addAllNames");

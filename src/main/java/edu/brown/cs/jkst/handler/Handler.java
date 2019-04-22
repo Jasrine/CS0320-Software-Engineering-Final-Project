@@ -6,7 +6,9 @@ import java.util.Map;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 
+import edu.brown.cs.jkst.graphdata.Movie;
 import edu.brown.cs.jkst.query.FilmQuery;
+import edu.brown.cs.jkst.query.SearchCommand;
 import edu.brown.cs.jkst.suggest.SuggestCommand;
 import spark.QueryParamsMap;
 import spark.Request;
@@ -31,7 +33,10 @@ public final class Handler {
     public String handle(Request req, Response res) {
       QueryParamsMap qm = req.queryMap();
       String search = qm.value("search");
-      String suggestions = SuggestCommand.INSTANCE.getSuggestions(search);
+      String region = qm.value("region");
+      String genre = qm.value("genre");
+      String decade = qm.value("decade");
+      String suggestions = SuggestCommand.INSTANCE.getTextSuggestions(search);
       List<String> regions = FilmQuery.getRegions();
       List<String> genres = FilmQuery.getGenres();
       List<String> decades = FilmQuery.getDecades();
@@ -49,8 +54,15 @@ public final class Handler {
   public static class SearchSubmitHandler implements Route {
     @Override
     public String handle(Request req, Response res) {
+      QueryParamsMap qm = req.queryMap();
+      String search = qm.value("search");
+      String region = qm.value("region");
+      String genre = qm.value("genre");
+      String decade = qm.value("decade");
+      List<Movie> results = SearchCommand.INSTANCE.search(search, decade,
+          region, genre);
       Map<String, Object> variables = ImmutableMap.of("title",
-          "Film suggestions", "results", "results");
+          "Film suggestions", "results", results);
       return GSON.toJson(variables);
     }
   }

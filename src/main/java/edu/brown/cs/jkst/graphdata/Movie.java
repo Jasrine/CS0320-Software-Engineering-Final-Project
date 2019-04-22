@@ -12,6 +12,7 @@ public class Movie implements Node<Movie, MEdge> {
   private String id;
   private String filmName;
   private String director;
+  private int year;
   private List<String> genres;
   private List<String> crew;
   private List<String> regions;
@@ -26,16 +27,19 @@ public class Movie implements Node<Movie, MEdge> {
    *          String name for displaying the film.
    * @param director
    *          String id for director.
+   * @param year
+   *          number specifying the year in which it premiered.
    * @param genres
    *          List of String where each String is a genre.
    * @param regions
    *          List of regions in which the film is available.
    */
   public Movie(String id, String filmName, String director,
-      List<String> genres, List<String> regions) {
+      int year, List<String> genres, List<String> regions) {
     this.id = id;
     this.filmName = filmName;
     this.director = director;
+    this.year = year;
     this.genres = genres;
     this.regions = regions;
   }
@@ -59,11 +63,6 @@ public class Movie implements Node<Movie, MEdge> {
   @Override
   public Set<MEdge> getEdges() {
     return this.edges;
-  }
-
-  @Override
-  public String toString() {
-    return this.filmName;
   }
 
   /**
@@ -100,5 +99,27 @@ public class Movie implements Node<Movie, MEdge> {
    */
   public List<String> getRegions() {
     return this.regions;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("Film name: " + this.filmName + "\n");
+    sb.append("Director: " + this.director + "\n");
+    sb.append("Year: " + this.year + "\n");
+    sb.append("Genres: " + this.genres.toString() + "\n");
+    sb.append("Regions: " + this.regions.toString() + "\n");
+    return sb.toString();
+  }
+
+  @Override
+  public int hashCode() {
+    return this.id.hashCode();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    Movie con = (Movie) o;
+    return this.id.equals(con.getNodeId());
   }
 }

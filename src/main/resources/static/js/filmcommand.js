@@ -5,17 +5,22 @@ class Film {
 	/*
 	 * contains relevant information for the class 
 	 */
-	constructor(title, director, genres, year, runtime, crew) {
+	constructor(id, title, director, genres, year, regions) {
+		this.id = id;
 		this.title = title;
 		this.director = director;
 		this.genres = genres;
 		this.year = year;
-		this.runtime = runtime;
-		this.crew = crew;
+		this.regions = regions;
 	}
 
 	renderFilmNode() {
 		// create node and add relevant information to it.
+	}
+
+	toString() {
+		return "Film title: " + this.title + "\n Director: " + this.director + "\n Genres: " + this.genres 
+		+ "\n Year in which this premiered: " + this.year + "\n Regions: " + this.regions;
 	}
 }
 
@@ -75,37 +80,38 @@ $(document).ready(() => {
 
 	($searchQuery).keyup(event => {
 		if (event.which != 32) {	
-			// console.log(getSelectedOption(regions));
-			// console.log(getSelectedOption(decades));
-			// console.log(getSelectedOption(genres));
-			// console.log(getSelectedOption(regions).value);
-
+			const region = (getSelectedOption(regions).value == 0) ? "" : getSelectedOption(regions).text;
+			const genre = (getSelectedOption(genres).value == 0) ? "" : getSelectedOption(genres).text;
+			const decade = (getSelectedOption(decades).value == 0) ? "" : getSelectedOption(decades).text;
+			const params = {
+				"search": $searchQuery.val(),
+				"genre": genre,
+				"region": region,
+				"decade": decade
+			};
+			console.log(params);
+			// when enter is pressed
 			if (event.which == 13) {
-				const region = (getSelectedOption(regions).value == 0) ? null : getSelectedOption(regions).text;
-				const genre = (getSelectedOption(genres).value == 0) ? null : getSelectedOption(genres).text;
-				const decade = (getSelectedOption(regions).value == 0) ? null : getSelectedOption(decades).text;
-
-				const params = {
-					"search": $searchQuery.val(),
-					"genres": genre,
-					"regions": region,
-					"decades": decade
-				};
-				
 				// if a user presses enter, search through database with the options the user has selected.
-				// $.post("/search", params2, responseJSON => {
-				// 	const responseObject = JSON.parse(responseJSON);
+				$.post("/search", params, responseJSON => {
+					const responseObject = JSON.parse(responseJSON);
+					console.log(responseObject);
 
-				// 	$suggestions.text(responseObject.suggestions);
-				// 	$suggestions.html(responseObject.suggestions);
-				// 	$suggestions.val(responseObject.suggestions);
-	   //      		console.log(responseObject);
-	   //      		console.log(responseObject.suggestions);
-				// });
+					for (let j = $suggestions[0].children.length-1; j >= 0; j--) {
+						$suggestions[0].removeChild($suggestions[0].children[j]);
+					}
+					responseObject.results.forEach(suggestion => {
+						let f = new Film(suggestion.id, suggestion.filmName, suggestion.director, suggestion.genres,
+							suggestion.year, suggestion.regions);
+
+
+
+						console.log(suggestion);
+						const $node = $("<li class=\"ui-widget-content\">").text(f.toString());
+						$suggestions.append($node);
+					});
+				});
 			} else {
-				const params = {
-					"search": $searchQuery.val()
-				};
 				$.post("/suggest", params, responseJSON => {
 					const responseObject = JSON.parse(responseJSON);
 					let i = 0;
