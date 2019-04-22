@@ -49,6 +49,7 @@ public class Title {
    * X $ $
    * $ X $
    * $ $ X
+   * $ $ $ -- yes
    *
    * POSITION relative to initial
    * DELETE A - cost 80
