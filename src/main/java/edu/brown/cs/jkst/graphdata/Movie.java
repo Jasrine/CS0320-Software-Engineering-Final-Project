@@ -1,8 +1,8 @@
 package edu.brown.cs.jkst.graphdata;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+
+import static java.lang.Double.compare;
 
 /**
  * class describing a film node, implements our node interface.
@@ -128,6 +128,13 @@ public class Movie implements Node<Movie, MEdge> {
     return this.numVotes;
   }
 
+
+  public Set<Movie> suggest(Set<Movie> movies) {
+    Set<Movie> suggestions = new TreeSet<>(Comparator.comparingDouble(this::scoreSimilarity));
+    suggestions.addAll(movies);
+    return suggestions;
+  }
+
   /**
    * Very simple way to decide the following: how similar are these movies?
    * @return a score indicating how similar the two movies are predicted to be.
@@ -190,7 +197,7 @@ public class Movie implements Node<Movie, MEdge> {
     // the "similarity" is inflated, making the "better" movie a more appealing
     // suggestion.
     double ratingScore = 1.0 - (Math.abs(this.rating - that.rating) * 0.1);
-    //TODO: the rating is more or less meaningful depending on numVotes
+    //TODO: is the rating more or less meaningful depending on numVotes?
 
     //TODO: crewScore (similar to genre score but with no weight on order?)
     //TODO: regionScore (positive or negative depending on preference?)
