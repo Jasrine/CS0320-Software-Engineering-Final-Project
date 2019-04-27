@@ -29,7 +29,7 @@ public final class SuggestCommand implements Command {
    *          String which we want to pass into the trie
    * @return Set of strings which are reasonable suggestions for the user.
    */
-  public String getSuggestions(String search) {
+  public String getTextSuggestions(String search) {
     return FilmQuery.INSTANCE.findSuggestion(search);
   }
 

@@ -1,8 +1,41 @@
+.outer {
+  display: grid;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  grid-column-gap: 20px;
+  grid-row-gap: 20px;
+}
+
 .index {
-	top: 50%;
-	position: relative;
-	text-align: center;
-	vertical-align: middle;
+  display: grid;
+  vertical-align: middle;
+  margin-left: auto;
+  margin-right: auto;
+  width: 700px;
+  text-align: center;
+}
+
+a:link {
+    color: #E6E6FA;
+}
+
+a:hover {
+    color: #FFE4E1;
+}
+
+a:active {
+    color: #FFB6C1;
+}
+
+.selected {
+  color: #BA55D3;
+}
+
+.hover {
+  color: #BA55D3;
 }
 
 body {
@@ -12,13 +45,17 @@ body {
 }
 
 .column1 {
-    width: 65%;
+    grid-row: 2;
+    grid-column: 1 / 2;
+    width: 50%;
     float: left;
 }
 
 .column2 {
-    width: 100%;
-    padding-left: 65%;
+    grid-row: 2;
+    grid-column: 2 / 2;
+    width: 50%;
+    padding-left: 50%;
 }
 
 .row:after{

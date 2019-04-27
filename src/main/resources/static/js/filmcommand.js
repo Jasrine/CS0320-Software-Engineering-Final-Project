@@ -1,44 +1,138 @@
+/* 
+ * class that describes a Film node and methods for its display
+ */
+class Film {
+	/*
+	 * contains relevant information for the class 
+	 */
+	constructor(id, title, director, genres, year, regions) {
+		this.id = id;
+		this.title = title;
+		this.director = director;
+		this.genres = genres;
+		this.year = year;
+		this.regions = regions;
+	}
 
+	renderFilmNode() {
+		// create node and add relevant information to it.
+	}
+
+	toString() {
+		return "Film title: " + this.title + "\n Director: " + this.director + "\n Genres: " + this.genres 
+		+ "\n Year in which this premiered: " + this.year + "\n Regions: " + this.regions;
+	}
+}
+
+/*
+ * function that gets the selected option when only one selection is allowed
+ */
+function getSelectedOption(sel) {
+    let opt = 0;
+    for (let i = 0; i < sel.options.length; i++) {
+        opt = sel.options[i];
+        if (opt.selected === true) {
+        	break;
+        }
+    }
+
+    return opt;
+}
+
+/*
+ * helper for adding options with a given counter.
+ */
+function addOptions(res, sel, counter) {
+	res.forEach(opt => {
+		if (opt != null && opt != undefined) {
+			const option = document.createElement("option");
+			option.text = opt;
+			option.setAttribute('value', counter);
+			sel.add(option);
+			counter = counter + 1;
+		}
+	});
+}
+
+// Global references
+const $searchQuery = $("#search");
+const $suggestions = $("#suggestions");
+const $searchResults = $("#searchResults");
+const regions = document.getElementById("regions");
+const decades = document.getElementById("decades");
+const genres = document.getElementById("genres");
+
+document.getElementById("suggestions").addEventListener("click", function(e) {
+	console.log(e);
+  if (e.target && e.target.matches("li.ui-widget-content")) {
+  	console.log("foo");
+    //e.target.style.color = "#9932CC";
+    $searchQuery.value = e.target.innerHTML;
+    $searchQuery.val(e.target.innerHTML);
+  }
+});
 
 $(document).ready(() => {
-	const $searchQuery = $("#search");
-	const $suggestions = $("#suggestions");
-	const regions = document.getElementById("regions");
-	let region_i = 0;
-	const params = {};
-	console.log(regions);
-
-	$.post("/init", params, responseJSON => {
+	let region_i = 1;
+	let genre_i = 1;
+	let decade_i = 1;
+	
+	// initialization
+	$.post("/init", {}, responseJSON => {
 		const responseObject = JSON.parse(responseJSON);
-		console.log(responseObject);
-		responseObject.regions.forEach(region => {
-			if (region != null && region != undefined) {
-				const option = document.createElement("option");
-				option.text = region;
-				console.log(region);
-				console.log(option);
-				regions.add(option);
-
-				region_i = region_i + 1;
-			}
-		});
+		addOptions(responseObject.regions, regions, region_i);
+		addOptions(responseObject.genres, genres, genre_i);
+		addOptions(responseObject.decades, decades, decade_i);
 	});
 
 	($searchQuery).keyup(event => {
-		if (event.which != 32) {
-			params = {
-				"search": $searchQuery.val()
+		if (event.which != 32) {	
+			const region = (getSelectedOption(regions).value == 0) ? "" : getSelectedOption(regions).text;
+			const genre = (getSelectedOption(genres).value == 0) ? "" : getSelectedOption(genres).text;
+			const decade = (getSelectedOption(decades).value == 0) ? "" : getSelectedOption(decades).text;
+			const params = {
+				"search": $searchQuery.val(),
+				"genre": genre,
+				"region": region,
+				"decade": decade
 			};
 			console.log(params);
-			$.post("/suggest", params, responseJSON => {
-				const responseObject = JSON.parse(responseJSON);
+			// when enter is pressed
+			if (event.which == 13) {
+				// if a user presses enter, search through database with the options the user has selected.
+				$.post("/search", params, responseJSON => {
+					const responseObject = JSON.parse(responseJSON);
+					console.log(responseObject);
 
-				$suggestions.text(responseObject.suggestions);
-				$suggestions.html(responseObject.suggestions);
-				$suggestions.val(responseObject.suggestions);
-        		console.log(responseObject);
-        		console.log(responseObject.suggestions);
-			});
+					for (let j = $searchResults[0].children.length-1; j >= 0; j--) {
+						$searchResults[0].removeChild($searchResults[0].children[j]);
+					}
+					responseObject.results.forEach(suggestion => {
+						let f = new Film(suggestion.id, suggestion.filmName, suggestion.director, suggestion.genres,
+							suggestion.year, suggestion.regions);
+
+
+
+						console.log(suggestion);
+						const $node = $("<li class=\"ui-widget-content\">").text(f.toString());
+						$searchResults.append($node);
+					});
+				});
+			} else {
+				$.post("/suggest", params, responseJSON => {
+					const responseObject = JSON.parse(responseJSON);
+					let i = 0;
+
+					for (let j = $suggestions[0].children.length-1; j >= 0; j--) {
+						$suggestions[0].removeChild($suggestions[0].children[j]);
+					}
+					responseObject.suggestions.split("\n").forEach(suggestion => {
+						const $node = $("<li class=\"ui-widget-content\">").text(suggestion);
+						$suggestions.append($node);
+						i = i + 1;
+					});
+				});
+			}
 		}
 	});
 });

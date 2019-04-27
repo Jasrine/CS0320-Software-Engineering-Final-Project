@@ -1,8 +1,9 @@
 package edu.brown.cs.jkst.graphdata;
 
-import java.util.*;
-
-import static java.lang.Double.compare;
+import java.util.HashSet;
+import java.util.TreeSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * class describing a film node, implements our node interface.
@@ -12,6 +13,7 @@ public class Movie implements Node<Movie, MEdge> {
   private String id;
   private String filmName;
   private String director;
+  private int year;
   private List<String> genres;
   private List<String> crew;
   private List<String> regions;
@@ -28,6 +30,8 @@ public class Movie implements Node<Movie, MEdge> {
    *          String name for displaying the film.
    * @param director
    *          String id for director.
+   * @param year
+   *          number specifying the year in which it premiered.
    * @param genres
    *          List of String where each String is a genre.
    * @param regions
@@ -38,10 +42,12 @@ public class Movie implements Node<Movie, MEdge> {
    *          int number of votes contributing to the rating.
    */
   public Movie(String id, String filmName, String director,
-      List<String> genres, List<String> regions, double rating, int numVotes) {
+      int year, List<String> genres, List<String> regions,
+               double rating, int numVotes) {
     this.id = id;
     this.filmName = filmName;
     this.director = director;
+    this.year = year;
     this.genres = genres;
     this.regions = regions;
     this.rating = rating;
@@ -67,11 +73,6 @@ public class Movie implements Node<Movie, MEdge> {
   @Override
   public Set<MEdge> getEdges() {
     return this.edges;
-  }
-
-  @Override
-  public String toString() {
-    return this.filmName;
   }
 
   /**
@@ -207,5 +208,27 @@ public class Movie implements Node<Movie, MEdge> {
     //TODO: all parts of the score should be toggleable based on search settings
 
     return directorScore + genreScore + ratingScore;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("Film name: " + this.filmName + "\n");
+    sb.append("Director: " + this.director + "\n");
+    sb.append("Year: " + this.year + "\n");
+    sb.append("Genres: " + this.genres.toString() + "\n");
+    sb.append("Regions: " + this.regions.toString() + "\n");
+    return sb.toString();
+  }
+
+  @Override
+  public int hashCode() {
+    return this.id.hashCode();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    Movie con = (Movie) o;
+    return this.id.equals(con.getNodeId());
   }
 }

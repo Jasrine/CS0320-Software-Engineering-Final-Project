@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -26,10 +27,16 @@ public final class FilmQuery {
   private static Connection conn = null;
   private static String[] genres = {
       "Short", "Comedy", "Documentary", "Sport", "Romance", "Family", "Drama",
-      "Music", "Musical", "Action", "Adventure", "Film Noir", "Mystery",
+      "Music", "Musical", "Action", "Adventure", "Noir", "Mystery",
       "Thriller", "Horror", "Fantasy", "Western", "War", "Animation",
-      "Biography", "Crime"
+      "Biography", "Crime", "History"
   };
+  private static String[] decades = {
+      "1890s", "1900s", "1910s", "1920s", "1930s", "1940s", "1950s",
+      "1960s", "1970s", "1980s", "1990s", "2000s", "2010s"
+  };
+  private static List<String> genreList = Arrays.asList(genres);
+  private static List<String> decadeList = Arrays.asList(decades);
 
   /**
    * Constructor for FilmQuery.
@@ -56,6 +63,26 @@ public final class FilmQuery {
   }
 
   /**
+   * getter for the chronologically sorted list of decades from which the user
+   * can choose a film in advanced search.
+   *
+   * @return List of String with decades.
+   */
+  public static List<String> getDecades() {
+    return decadeList;
+  }
+
+  /**
+   * getter for the alphabetically sorted list of regions available to the user.
+   *
+   * @return List of String with regions.
+   */
+  public static List<String> getGenres() {
+    Collections.sort(genreList);
+    return genreList;
+  }
+
+  /**
    * Method to create a connection to the database.
    *
    * @return 1 - if there is an error, or 0 if there is no error.
@@ -63,20 +90,11 @@ public final class FilmQuery {
   public int createConnection() {
     try {
       Class.forName("org.sqlite.JDBC");
-      conn = DriverManager.getConnection("jdbc:sqlite:data/imdb.db");
+      conn = DriverManager.getConnection("jdbc:sqlite:data/imdb5.db");
       Statement stat = conn.createStatement();
       stat.executeUpdate("PRAGMA foreign_keys = ON;");
 
       // clean up cache at this point if a cache exists
-
-      // loading trie
-      trie = new Trie<Character>();
-      addAllNames();
-      System.out.println("done loading in trie");
-
-      // loading in regions
-      addAllRegions();
-      System.out.println("done loading in regions");
       return 0;
     } catch (ClassNotFoundException e) {
       System.out.println(
@@ -85,6 +103,19 @@ public final class FilmQuery {
     } catch (SQLException e) {
       System.out.println("ERROR: SQL Exception (in creating connection)");
       return 1;
+    } finally {
+      if (conn != null) {
+        // loading trie
+        trie = new Trie<Character>();
+        addAllNames();
+        System.out.println("done loading in trie");
+
+        // loading in regions
+        addAllRegions();
+        System.out.println("done loading in regions");
+        // return 0;
+      }
+
     }
   }
 
@@ -127,20 +158,14 @@ public final class FilmQuery {
   public void addAllNames() {
     try {
       String q = "SELECT DISTINCT primary_title FROM titles "
-          + "WHERE runtime_minutes > 3";
+          + "WHERE runtime_minutes > 5";
       PreparedStatement prep = conn.prepareStatement(q);
-      // HashSet<String> names = new HashSet<String>();
       ResultSet rs = prep.executeQuery();
       while (rs.next()) {
         trie.insert(rs.getString(1));
-        // names.add(rs.getString(1));
       }
       rs.close();
       prep.close();
-      // for (String name : names) {
-      // trie.insert(name);
-      // System.out.println(name);
-      // }
     } catch (SQLException e) {
       System.out.println("ERROR: SQL Exception caught in addAllNames");
     }
@@ -151,52 +176,27 @@ public final class FilmQuery {
    */
   public void addAllRegions() {
     try {
-      String q = "SELECT DISTINCT region FROM akas;";
+      String q = "SELECT DISTINCT region FROM titles;";
       PreparedStatement prep = conn.prepareStatement(q);
       ResultSet rs = prep.executeQuery();
-      while (rs.next()) {
-        regions.add(rs.getString(1));
-      }
-      rs.close();
-      prep.close();
-      Collections.sort(regions);
-    } catch (SQLException e) {
-      System.out.println("ERROR: SQL Exception caught in addAllNames");
-    }
-  }
 
-  /**
-   * add all decades to the list of strings for regions.
-   */
-  public void addAllDecades() {
-    try {
-      String q = "SELECT DISTINCT premiered FROM titles;";
-      PreparedStatement prep = conn.prepareStatement(q);
-      ResultSet rs = prep.executeQuery();
+      Set<String> regionSet = new HashSet<String>();
       while (rs.next()) {
-        regions.add(rs.getString(1));
+        if (rs.getString(1) != null) {
+          String txt = rs.getString(1);
+          for (String piece : txt.split(",")) {
+            regionSet.add(piece);
+          }
+          // regions.add(rs.getString(1));
+          System.out.println(rs.getString(1));
+        }
       }
       rs.close();
       prep.close();
-      Collections.sort(regions);
-    } catch (SQLException e) {
-      System.out.println("ERROR: SQL Exception caught in addAllNames");
-    }
-  }
 
-  /**
-   * add all decades to the list of strings for regions.
-   */
-  public void addAllGenres() {
-    try {
-      String q = "SELECT DISTINCT premiered FROM titles;";
-      PreparedStatement prep = conn.prepareStatement(q);
-      ResultSet rs = prep.executeQuery();
-      while (rs.next()) {
-        regions.add(rs.getString(1));
+      for (String piece : regionSet) {
+        regions.add(piece);
       }
-      rs.close();
-      prep.close();
       Collections.sort(regions);
     } catch (SQLException e) {
       System.out.println("ERROR: SQL Exception caught in addAllNames");

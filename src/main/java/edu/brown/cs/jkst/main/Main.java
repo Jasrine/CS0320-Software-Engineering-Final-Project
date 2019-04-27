@@ -56,11 +56,15 @@ public final class Main {
       runSparkServer((int) options.valueOf("port"));
     }
 
-    Repl r = new Repl();
-    MovieDatabase md = new MovieDatabase();
-    md.registerAllCommands(r.CM);
+    try {
+      Repl r = new Repl();
+      MovieDatabase md = new MovieDatabase();
+      md.registerAllCommands(r.CM);
 
-    r.read();
+      r.read();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
 
     System.exit(-1);
   }
@@ -89,7 +93,7 @@ public final class Main {
     Spark.get("/filmdb", new InitHandlers.FrontHandler(), freeMarker);
     Spark.post("/init", new InitHandlers.FrontInitHandler());
     Spark.post("/suggest", new Handler.SearchSuggestHandler());
-    Spark.get("/filmdb/results", new Handler.SearchSubmitHandler(), freeMarker);
+    Spark.post("/search", new Handler.SearchSubmitHandler());
   }
 
   /**
