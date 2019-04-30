@@ -1,9 +1,6 @@
 package edu.brown.cs.jkst.graphdata;
 
-import java.util.HashSet;
-import java.util.TreeSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * class describing a film node, implements our node interface.
@@ -129,7 +126,9 @@ public class Movie implements Node<Movie, MEdge> {
     return this.numVotes;
   }
 
+  //TODO: raw ranking for searches that are NOT by similarity
 
+  //TODO: javadoc
   public Set<Movie> suggest(Set<Movie> movies) {
     Set<Movie> suggestions = new TreeSet<>(Comparator.comparingDouble(this::scoreSimilarity));
     suggestions.addAll(movies);
