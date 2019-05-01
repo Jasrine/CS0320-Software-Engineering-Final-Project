@@ -1,9 +1,9 @@
 package edu.brown.cs.jkst.graphdata;
 
-import java.util.HashSet;
-import java.util.TreeSet;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * class describing a film node, implements our node interface.
@@ -36,27 +36,40 @@ public class Movie implements Node<Movie, MEdge> {
    *          List of String where each String is a genre.
    * @param regions
    *          List of regions in which the film is available.
-   * @param rating
-   *          double between 0 and 10 giving the film's IMDB rating.
-   * @param numVotes
-   *          int number of votes contributing to the rating.
    */
   public Movie(String id, String filmName, String director,
-      int year, List<String> genres, List<String> regions,
-               double rating, int numVotes) {
+      int year, List<String> genres, List<String> regions) {
     this.id = id;
     this.filmName = filmName;
     this.director = director;
     this.year = year;
     this.genres = genres;
     this.regions = regions;
-    this.rating = rating;
-    this.numVotes = numVotes;
   }
 
   @Override
   public String getNodeId() {
     return this.id;
+  }
+
+  /**
+   * sets rating to a given value.
+   *
+   * @param rating
+   *          to set the movie rating to.
+   */
+  public void setRating(double rating) {
+    this.rating = rating;
+  }
+
+  /**
+   * sets rating to a given value.
+   *
+   * @param numvotes
+   *          to set the movie rating to.
+   */
+  public void setVotes(int numvotes) {
+    this.numVotes = numvotes;
   }
 
   @Override
@@ -129,34 +142,38 @@ public class Movie implements Node<Movie, MEdge> {
     return this.numVotes;
   }
 
-
   public Set<Movie> suggest(Set<Movie> movies) {
-    Set<Movie> suggestions = new TreeSet<>(Comparator.comparingDouble(this::scoreSimilarity));
+    Set<Movie> suggestions = new TreeSet<>(
+        Comparator.comparingDouble(this::scoreSimilarity));
     suggestions.addAll(movies);
     return suggestions;
   }
 
   /**
    * Very simple way to decide the following: how similar are these movies?
+   *
+   * @param m
+   *          movie to compare.
    * @return a score indicating how similar the two movies are predicted to be.
-   * Higher score indicates more similarities. Factors considered include
-   * director, genre(s) according to IMDB, rating according to IMDB, ...
+   *         Higher score indicates more similarities. Factors considered
+   *         include director, genre(s) according to IMDB, rating according to
+   *         IMDB, ...
    */
-  public double scoreSimilarity(Movie that) {
+  public double scoreSimilarity(Movie m) {
     double directorScore = 0.0;
-    if (this.director.equals(that.director)) {
+    if (this.director.equals(m.director)) {
       directorScore = 1.0;
     }
 
-    //TODO: consider averaging the genre similarity in both directions
-    //TODO: consider accounting for the varying tones in the actual genres
+    // TODO: consider averaging the genre similarity in both directions
+    // TODO: consider accounting for the varying tones in the actual genres
     double genreScore = 0.0;
     String AA = this.genres.get(0);
-    String aa = that.genres.get(0);
+    String aa = m.genres.get(0);
     String BB = this.genres.get(1);
-    String bb = that.genres.get(1);
+    String bb = m.genres.get(1);
     String CC = this.genres.get(2);
-    String cc = that.genres.get(2);
+    String cc = m.genres.get(2);
     boolean isOverlap1 = true;
     if (aa.equals(AA)) {
       genreScore += 39.0;
@@ -188,36 +205,44 @@ public class Movie implements Node<Movie, MEdge> {
       isOverlap3 = false;
     }
     if (isOverlap1 || isOverlap2 || isOverlap3) {
-      //adjust it so it's a scale of 0-100 (but first nonzero is 26)
+      // adjust it so it's a scale of 0-100 (but first nonzero is 26)
       genreScore += 26.0;
     }
     genreScore *= 0.01;
 
-    //The smaller the difference in rating, the more similar the movies are said
+    // The smaller the difference in rating, the more similar the movies are
+    // said
     // to be. This could be modified so that if the OTHER movie is rated higher
     // the "similarity" is inflated, making the "better" movie a more appealing
     // suggestion.
-    double ratingScore = 1.0 - (Math.abs(this.rating - that.rating) * 0.1);
-    //TODO: is the rating more or less meaningful depending on numVotes?
+    double ratingScore = 1.0 - (Math.abs(this.rating - m.rating) * 0.1);
+    // TODO: is the rating more or less meaningful depending on numVotes?
 
-    //TODO: crewScore (similar to genre score but with no weight on order?)
-    //TODO: regionScore (positive or negative depending on preference?)
-    //TODO: titleScore (? [still not sure that this is an important metric])
-    //TODO: awardScore (?? [dependent on ability to get more data])
+    // TODO: crewScore (similar to genre score but with no weight on order?)
+    // TODO: regionScore (positive or negative depending on preference?)
+    // TODO: titleScore (? [still not sure that this is an important metric])
+    // TODO: awardScore (?? [dependent on ability to get more data])
 
-    //TODO: all parts of the score should be toggleable based on search settings
+    // TODO: all parts of the score should be toggleable based on search
+    // settings
 
     return directorScore + genreScore + ratingScore;
   }
 
   @Override
   public String toString() {
+    StringBuilder regionSb = new StringBuilder();
+    for (String region : this.regions) {
+      regionSb.append(region + ", ");
+    }
+    String regionStr = regionSb.substring(0, regionSb.length() - 2);
+
     StringBuilder sb = new StringBuilder();
     sb.append("Film name: " + this.filmName + "\n");
     sb.append("Director: " + this.director + "\n");
     sb.append("Year: " + this.year + "\n");
     sb.append("Genres: " + this.genres.toString() + "\n");
-    sb.append("Regions: " + this.regions.toString() + "\n");
+    sb.append("Regions: " + regionStr + "\n");
     return sb.toString();
   }
 

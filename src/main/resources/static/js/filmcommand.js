@@ -19,8 +19,32 @@ class Film {
 	}
 
 	toString() {
+		let region = this.regions.join(", ");
+		//console.log(region);
+		console.log(this.regions.join(", "));
+		let line = region;
+		let regionStr = "";
+		while (line.length > 80) {
+			let piece = line.substring(0, 80);
+			let lastSpace = piece.lastIndexOf(", ");
+			piece = piece.substring(0, lastSpace);
+			console.log(piece);
+			regionStr += (piece.concat("\n"));
+			line = line.substring(lastSpace + 1, line.length - 1);
+		}
+		if (regionStr.length < 1) {
+			regionStr = region;
+		}
+		// this.regions.forEach(reg => {
+		// 	region += (", " + reg);
+		// })
+		// if (region.length > 0) {
+		// 	region = region.sub
+		// }
+
+
 		return "Film title: " + this.title + "\n Director: " + this.director + "\n Genres: " + this.genres 
-		+ "\n Year in which this premiered: " + this.year + "\n Regions: " + this.regions;
+		+ "\n Year in which this premiered: " + this.year + "\n Regions: " + regionStr;//this.regions.join(", ");
 	}
 }
 
