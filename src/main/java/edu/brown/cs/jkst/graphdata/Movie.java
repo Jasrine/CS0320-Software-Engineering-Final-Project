@@ -36,10 +36,6 @@ public class Movie implements Node<Movie, MEdge> {
    *          List of String where each String is a genre.
    * @param regions
    *          List of regions in which the film is available.
-   * @param rating
-   *          double between 0 and 10 giving the film's IMDB rating.
-   * @param numVotes
-   *          int number of votes contributing to the rating.
    */
   public Movie(String id, String filmName, String director,
       int year, List<String> genres, List<String> regions) {
