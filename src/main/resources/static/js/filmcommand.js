@@ -126,6 +126,7 @@ $(document).ready(() => {
 				// if a user presses enter, search through database with the options the user has selected.
 				$.post("/search", params, responseJSON => {
 					const responseObject = JSON.parse(responseJSON);
+					console.log("TEST!!!\n");
 					console.log(responseObject);
 
 					for (let j = $searchResults[0].children.length-1; j >= 0; j--) {

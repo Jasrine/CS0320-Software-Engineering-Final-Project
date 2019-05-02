@@ -122,8 +122,7 @@ public final class FilmQuery {
   /**
    * helper method called by CommandLine.
    *
-   * @param search
-   *          String searched for.
+   * @param search String searched for.
    * @return Set of suggestions from trie.
    */
   public String findSuggestion(String search) {
@@ -134,18 +133,16 @@ public final class FilmQuery {
 
     // put in unsorted list
     LinkedList<String> unsortedResults = new LinkedList<String>();
-    for (String result : results) {
-      unsortedResults.add(result);
-    }
+    unsortedResults.addAll(results);
 
     // sort these
-    Collections.sort(unsortedResults, new AutocorrectComparator(search));
+    unsortedResults.sort(new AutocorrectComparator(search));
 
     int start = 0;
     StringBuilder sb = new StringBuilder();
 
     while (start < numResults && !unsortedResults.isEmpty()) {
-      sb.append(unsortedResults.removeLast() + "\n");
+      sb.append(unsortedResults.removeLast()).append("\n");
       start++;
     }
 
@@ -184,9 +181,7 @@ public final class FilmQuery {
       while (rs.next()) {
         if (rs.getString(1) != null) {
           String txt = rs.getString(1);
-          for (String piece : txt.split(",")) {
-            regionSet.add(piece);
-          }
+          regionSet.addAll(Arrays.asList(txt.split(",")));
           // regions.add(rs.getString(1));
           // System.out.println(rs.getString(1));
         }
@@ -194,9 +189,7 @@ public final class FilmQuery {
       rs.close();
       prep.close();
 
-      for (String piece : regionSet) {
-        regions.add(piece);
-      }
+      regions.addAll(regionSet);
       Collections.sort(regions);
     } catch (SQLException e) {
       System.out.println("ERROR: SQL Exception caught in addAllNames");
