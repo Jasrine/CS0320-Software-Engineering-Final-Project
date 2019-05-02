@@ -7,6 +7,8 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.Scanner;
 
+import edu.brown.cs.jkst.csvparser.CSVParser;
+
 /**
  * web scraping HTML.
  */
@@ -67,9 +69,16 @@ public final class HtmlGrabber {
   public static void grabFirstMillionFiles() {
     PrintWriter writer = null;
     try {
-      writer = new PrintWriter("titles-to-imageurl2.txt", "UTF-8");
-      for (int i = 808423; i <= MILLION; i++) {
-        grabSomeImgFiles(i, writer);
+      writer = new PrintWriter("titles-to-imageurl-last-few.txt", "UTF-8");
+      String fileContent = CSVParser.readFile(new PrintWriter(System.out),
+          "data/titleids.csv");
+      for (String line : fileContent.split("\n")) {
+        String url = "https://www.imdb.com/title/" + line.trim()
+            + "/mediaviewer";
+        String imgURL = grabHTML(url);
+        if (imgURL.trim().length() > 0) {
+          writer.println(line.trim() + "\t" + imgURL);
+        }
       }
     } catch (FileNotFoundException | UnsupportedEncodingException e) {
       e.printStackTrace();

@@ -13,6 +13,7 @@ public class Movie implements Node<Movie, MEdge>, Comparable<Movie> {
   private String id;
   private String filmName;
   private String director;
+  private String img;
   private int year;
   private List<String> genres;
   private List<String> crew;
@@ -31,6 +32,8 @@ public class Movie implements Node<Movie, MEdge>, Comparable<Movie> {
    *          String name for displaying the film.
    * @param director
    *          String id for director.
+   * @param imgURL
+   *          String containing a url for displaying the image if it exists.
    * @param year
    *          number specifying the year in which it premiered.
    * @param genres
@@ -42,12 +45,13 @@ public class Movie implements Node<Movie, MEdge>, Comparable<Movie> {
    * @param numVotes
    *          Number of people who contributed to the rating
    */
-  public Movie(String id, String filmName, String director,
+  public Movie(String id, String filmName, String director, String imgURL,
       int year, List<String> genres, List<String> regions,
                double rating, int numVotes) {
     this.id = id;
     this.filmName = filmName;
     this.director = director;
+    this.img = imgURL;
     this.year = year;
     this.genres = genres;
     this.regions = regions;
@@ -191,9 +195,17 @@ public class Movie implements Node<Movie, MEdge>, Comparable<Movie> {
 //    double awardsWon = 0.f; //TODO: if we have this data, number of awards won
 //
 //    return Math.sqrt(dataCompleteness*dataCompleteness + yearScore*yearScore + rating*rating);
-
-//    return dataCompleteness + yearScore + rating + awardsWon;
   }
+
+  /**
+   * getter for the image url.
+   *
+   * @return String that contains a link to the image if it exists.
+   */
+  public String getImageURL() {
+    return this.img;
+  }
+
 
 //  public double searchRelevancy(String title, String decade, String region,
 //                                String genres) {
@@ -206,9 +218,10 @@ public class Movie implements Node<Movie, MEdge>, Comparable<Movie> {
 
 
   /**
-   * @param movies a Set of Movies to compare this Movie against.
+   * @param movies
+   *          a Set of Movies to compare this Movie against.
    * @return a TreeSet of the same Movies reordered based on similarity to this
-   * movie.
+   *         movie.
    */
   public Set<Movie> suggest(Set<Movie> movies) {
     Set<Movie> suggestions = new TreeSet<>(
@@ -220,7 +233,9 @@ public class Movie implements Node<Movie, MEdge>, Comparable<Movie> {
   /**
    * Given a Movie, returns a number scoring how relatively similar that Movie
    * is to this Movie.
-   * @param m a Movie that is potentially similar to this Movie.
+   *
+   * @param m
+   *          a Movie that is potentially similar to this Movie.
    * @return a score indicating how similar the two movies are predicted to be.
    *         Higher score indicates more similarities. Factors considered
    *         include director, genre(s) according to IMDB, rating according to

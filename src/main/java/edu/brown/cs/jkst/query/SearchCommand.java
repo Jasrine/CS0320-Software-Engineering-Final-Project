@@ -40,11 +40,13 @@ public final class SearchCommand implements Command {
    *          of film.
    * @param genres
    *          which we wish to include in our search.
+   * @param service
+   *          which the movie should be available on.
    *
    * @return query for getting the right movies.
    */
   public String getQuery(String title, String decade, String region,
-      String genres) {
+      String genres, String service) {
     String queryString = "SELECT DISTINCT * FROM titles WHERE ";
     StringBuilder sb = new StringBuilder();
     sb.append(queryString);
@@ -88,6 +90,15 @@ public final class SearchCommand implements Command {
       }
     }
 
+    if (service != null && service.length() > 0) {
+      String servicePart = "streaming_services LIKE ?";
+      if (connect) {
+        sb.append("AND ").append(servicePart);
+      } else {
+        sb.append(servicePart);
+      }
+    }
+
     return sb.toString();
   }
 
@@ -104,12 +115,14 @@ public final class SearchCommand implements Command {
    *          of film.
    * @param genres
    *          which we wish to include in our search.
+   * @param service
+   *          which people want to find a movie on.
    *
    * @return List of similar movies.
    */
   public List<Movie> search(String title, String decade, String region,
-      String genres) {
-    String queryString = getQuery(title, decade, region, genres);
+      String genres, String service) {
+    String queryString = getQuery(title, decade, region, genres, service);
     Connection conn = FilmQuery.getConn();
 
     List<Movie> output = new LinkedList<>();
@@ -175,7 +188,8 @@ public final class SearchCommand implements Command {
           if (rs.wasNull()) {
             numVotes = 0;
           }
-          Movie m = new Movie(id, filmName, director, year, genreLst, regions, rating, numVotes);
+          String url = rs.getString(9);
+          Movie m = new Movie(id, filmName, director, url, year, genreLst, regions, rating, numVotes);
 
           // poss.add(m);
           output.add(m);
