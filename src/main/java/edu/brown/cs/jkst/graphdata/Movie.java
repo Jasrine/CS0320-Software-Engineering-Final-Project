@@ -127,16 +127,38 @@ public class Movie implements Node<Movie, MEdge> {
   }
 
   //TODO: raw ranking for searches that are NOT by similarity
+  /* Design Notes:
+   *  - Computed once and (should be) stored to improve speed.
+   *  -
+   * */
+  public float rawRank() {
+    float dataCompleteness = 0.f; //TODO: Number of fields that contain information
+    // The oldest movie on IMDB is from 1874, so subtracting 1870 from the date
+    // of release gives a normalized score that's higher the more current the
+    // movie is.
+    float yearScore = (float)(this.year - 1870);
+    float rating = (float) this.rating; //TODO: self explanatory
+    float awardsWon = 0.f; //TODO: if we have this data, number of awards won
 
-  //TODO: javadoc
+    return dataCompleteness + yearScore + rating + awardsWon;
+  }
+
+  /**
+   * @param movies a Set of Movies to compare this Movie against.
+   * @return a TreeSet of the same Movies reordered based on similarity to this
+   * movie.
+   */
   public Set<Movie> suggest(Set<Movie> movies) {
-    Set<Movie> suggestions = new TreeSet<>(Comparator.comparingDouble(this::scoreSimilarity));
+    Set<Movie> suggestions
+            = new TreeSet<>(Comparator.comparingDouble(this::scoreSimilarity));
     suggestions.addAll(movies);
     return suggestions;
   }
 
   /**
-   * Very simple way to decide the following: how similar are these movies?
+   * Given a Movie, returns a number scoring how relatively similar that Movie
+   * is to this Movie.
+   * @param that a Movie that is potentially similar to this Movie.
    * @return a score indicating how similar the two movies are predicted to be.
    * Higher score indicates more similarities. Factors considered include
    * director, genre(s) according to IMDB, rating according to IMDB, ...
@@ -196,8 +218,8 @@ public class Movie implements Node<Movie, MEdge> {
     // to be. This could be modified so that if the OTHER movie is rated higher
     // the "similarity" is inflated, making the "better" movie a more appealing
     // suggestion.
+    //TODO: normalize ratings by genre?
     double ratingScore = 1.0 - (Math.abs(this.rating - that.rating) * 0.1);
-    //TODO: is the rating more or less meaningful depending on numVotes?
 
     //TODO: crewScore (similar to genre score but with no weight on order?)
     //TODO: regionScore (positive or negative depending on preference?)
