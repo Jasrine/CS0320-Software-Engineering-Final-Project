@@ -90,7 +90,7 @@ public final class FilmQuery {
   public int createConnection() {
     try {
       Class.forName("org.sqlite.JDBC");
-      conn = DriverManager.getConnection("jdbc:sqlite:data/imdb5.db");
+      conn = DriverManager.getConnection("jdbc:sqlite:data/imdb9.db");
       Statement stat = conn.createStatement();
       stat.executeUpdate("PRAGMA foreign_keys = ON;");
 
@@ -113,7 +113,7 @@ public final class FilmQuery {
         // loading in regions
         addAllRegions();
         System.out.println("done loading in regions");
-        // return 0;
+        return 0;
       }
 
     }
@@ -188,7 +188,7 @@ public final class FilmQuery {
             regionSet.add(piece);
           }
           // regions.add(rs.getString(1));
-          System.out.println(rs.getString(1));
+          // System.out.println(rs.getString(1));
         }
       }
       rs.close();
