@@ -63,14 +63,6 @@ public final class Main {
       // String destinationFile = "secondimagefromimdb.jpg";
       // Image.saveImage(imageUrl, destinationFile);
 
-      // HtmlGrabber.grabHuluTitles();
-      // HtmlGrabber.grabFirstMillionFiles();
-      // HtmlGrabber.grabSomeImgFiles(8);
-      // HtmlGrabber.grabHTML("
-      // https://www.imdb.com/title/tt0000008/mediaviewer");
-
-      // HtmlGrabber.grabNetflixTitles();
-
       Repl r = new Repl();
       MovieDatabase md = new MovieDatabase();
       md.registerAllCommands(r.CM);

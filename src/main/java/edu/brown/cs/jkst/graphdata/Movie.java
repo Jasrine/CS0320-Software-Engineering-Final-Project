@@ -13,6 +13,7 @@ public class Movie implements Node<Movie, MEdge> {
   private String id;
   private String filmName;
   private String director;
+  private String img;
   private int year;
   private List<String> genres;
   private List<String> crew;
@@ -30,6 +31,8 @@ public class Movie implements Node<Movie, MEdge> {
    *          String name for displaying the film.
    * @param director
    *          String id for director.
+   * @param imgURL
+   *          String containing a url for displaying the image if it exists.
    * @param year
    *          number specifying the year in which it premiered.
    * @param genres
@@ -37,11 +40,12 @@ public class Movie implements Node<Movie, MEdge> {
    * @param regions
    *          List of regions in which the film is available.
    */
-  public Movie(String id, String filmName, String director,
+  public Movie(String id, String filmName, String director, String imgURL,
       int year, List<String> genres, List<String> regions) {
     this.id = id;
     this.filmName = filmName;
     this.director = director;
+    this.img = imgURL;
     this.year = year;
     this.genres = genres;
     this.regions = regions;
@@ -142,27 +146,37 @@ public class Movie implements Node<Movie, MEdge> {
     return this.numVotes;
   }
 
-  //TODO: raw ranking for searches that are NOT by similarity
-  /* Design Notes:
-   *  - Computed once and (should be) stored to improve speed.
-   *  -
-   * */
+  /**
+   * getter for the image url.
+   *
+   * @return String that contains a link to the image if it exists.
+   */
+  public String getImageURL() {
+    return this.img;
+  }
+
+  // TODO: raw ranking for searches that are NOT by similarity
+  /*
+   * Design Notes: - Computed once and (should be) stored to improve speed. -
+   */
   public float rawRank() {
-    float dataCompleteness = 0.f; //TODO: Number of fields that contain information
+    float dataCompleteness = 0.f; // TODO: Number of fields that contain
+                                  // information
     // The oldest movie on IMDB is from 1874, so subtracting 1870 from the date
     // of release gives a normalized score that's higher the more current the
     // movie is.
-    float yearScore = (float)(this.year - 1870);
-    float rating = (float) this.rating; //TODO: self explanatory
-    float awardsWon = 0.f; //TODO: if we have this data, number of awards won
+    float yearScore = this.year - 1870;
+    float rating = (float) this.rating; // TODO: self explanatory
+    float awardsWon = 0.f; // TODO: if we have this data, number of awards won
 
     return dataCompleteness + yearScore + rating + awardsWon;
   }
 
   /**
-   * @param movies a Set of Movies to compare this Movie against.
+   * @param movies
+   *          a Set of Movies to compare this Movie against.
    * @return a TreeSet of the same Movies reordered based on similarity to this
-   * movie.
+   *         movie.
    */
   public Set<Movie> suggest(Set<Movie> movies) {
     Set<Movie> suggestions = new TreeSet<>(
@@ -174,7 +188,9 @@ public class Movie implements Node<Movie, MEdge> {
   /**
    * Given a Movie, returns a number scoring how relatively similar that Movie
    * is to this Movie.
-   * @param m a Movie that is potentially similar to this Movie.
+   *
+   * @param m
+   *          a Movie that is potentially similar to this Movie.
    * @return a score indicating how similar the two movies are predicted to be.
    *         Higher score indicates more similarities. Factors considered
    *         include director, genre(s) according to IMDB, rating according to

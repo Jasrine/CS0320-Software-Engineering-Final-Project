@@ -35,8 +35,14 @@ public final class FilmQuery {
       "1890s", "1900s", "1910s", "1920s", "1930s", "1940s", "1950s",
       "1960s", "1970s", "1980s", "1990s", "2000s", "2010s"
   };
+
+  private static String[] services = {
+      "Netflix", "Hulu", "Amazon Prime Video", "Showtime", "Sundance TV",
+      "Epix", "Starz", "Hallmark", "Free Online Streaming Services", "HBO"
+  };
   private static List<String> genreList = Arrays.asList(genres);
   private static List<String> decadeList = Arrays.asList(decades);
+  private static List<String> serviceList = Arrays.asList(services);
 
   /**
    * Constructor for FilmQuery.
@@ -73,6 +79,16 @@ public final class FilmQuery {
   }
 
   /**
+   * getter for the list of services the user can choose from in advanced
+   * search.
+   *
+   * @return List of String with streaming services we have information for.
+   */
+  public static List<String> getServices() {
+    return serviceList;
+  }
+
+  /**
    * getter for the alphabetically sorted list of regions available to the user.
    *
    * @return List of String with regions.
@@ -90,7 +106,7 @@ public final class FilmQuery {
   public int createConnection() {
     try {
       Class.forName("org.sqlite.JDBC");
-      conn = DriverManager.getConnection("jdbc:sqlite:data/imdb9.db");
+      conn = DriverManager.getConnection("jdbc:sqlite:data/imdb10.db");
       Statement stat = conn.createStatement();
       stat.executeUpdate("PRAGMA foreign_keys = ON;");
 
@@ -158,7 +174,8 @@ public final class FilmQuery {
   public void addAllNames() {
     try {
       String q = "SELECT DISTINCT primary_title FROM titles "
-          + "WHERE runtime_minutes > 5";
+          + "WHERE runtime_minutes > 4 AND region IS NOT NULL "
+          + "AND premiered IS NOT NULL AND ratings > 5 AND votes IS NOT NULL";
       PreparedStatement prep = conn.prepareStatement(q);
       ResultSet rs = prep.executeQuery();
       while (rs.next()) {
@@ -187,8 +204,6 @@ public final class FilmQuery {
           for (String piece : txt.split(",")) {
             regionSet.add(piece);
           }
-          // regions.add(rs.getString(1));
-          // System.out.println(rs.getString(1));
         }
       }
       rs.close();
@@ -199,7 +214,7 @@ public final class FilmQuery {
       }
       Collections.sort(regions);
     } catch (SQLException e) {
-      System.out.println("ERROR: SQL Exception caught in addAllNames");
+      System.out.println("ERROR: SQL Exception caught in allAllRegions");
     }
   }
 }
