@@ -21,8 +21,7 @@ public class Movie implements Node<Movie, MEdge>, Comparable<Movie> {
   private Set<MEdge> edges;
   private double rating;
   private int numVotes;
-  private double rawRanking;
-
+  private double rawRanking; // TODO: give Jasrine txt file with ids and rawRanking for every movie
   /**
    * Constructor for Movie node.
    *
@@ -214,6 +213,7 @@ public class Movie implements Node<Movie, MEdge>, Comparable<Movie> {
 //    //2. measure release date similarity
 //    //3. measure region similarity
 //    //4. measure genre similarity
+  //TODO: comparator extending class!!!
 //  }
 
 
