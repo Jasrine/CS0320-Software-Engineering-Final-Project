@@ -57,6 +57,12 @@ public final class Main {
     }
 
     try {
+
+      // String imageUrl =
+      // "https://www.imdb.com/title/tt0000008/mediaviewer/rm1288008704";
+      // String destinationFile = "secondimagefromimdb.jpg";
+      // Image.saveImage(imageUrl, destinationFile);
+
       Repl r = new Repl();
       MovieDatabase md = new MovieDatabase();
       md.registerAllCommands(r.CM);

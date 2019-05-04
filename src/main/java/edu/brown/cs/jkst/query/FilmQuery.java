@@ -35,8 +35,14 @@ public final class FilmQuery {
       "1890s", "1900s", "1910s", "1920s", "1930s", "1940s", "1950s",
       "1960s", "1970s", "1980s", "1990s", "2000s", "2010s"
   };
+
+  private static String[] services = {
+      "Netflix", "Hulu", "Amazon Prime Video", "Showtime", "Sundance TV",
+      "Epix", "Starz", "Hallmark", "Free Online Streaming Services", "HBO"
+  };
   private static List<String> genreList = Arrays.asList(genres);
   private static List<String> decadeList = Arrays.asList(decades);
+  private static List<String> serviceList = Arrays.asList(services);
 
   /**
    * Constructor for FilmQuery.
@@ -73,6 +79,16 @@ public final class FilmQuery {
   }
 
   /**
+   * getter for the list of services the user can choose from in advanced
+   * search.
+   *
+   * @return List of String with streaming services we have information for.
+   */
+  public static List<String> getServices() {
+    return serviceList;
+  }
+
+  /**
    * getter for the alphabetically sorted list of regions available to the user.
    *
    * @return List of String with regions.
@@ -90,8 +106,7 @@ public final class FilmQuery {
   public int createConnection() {
     try {
       Class.forName("org.sqlite.JDBC");
-      conn = DriverManager.getConnection(
-          "jdbc:sqlite:data/imdb5.db");
+      conn = DriverManager.getConnection("jdbc:sqlite:data/imdb10.db");
       Statement stat = conn.createStatement();
       stat.executeUpdate("PRAGMA foreign_keys = ON;");
 
@@ -114,7 +129,7 @@ public final class FilmQuery {
         // loading in regions
         addAllRegions();
         System.out.println("done loading in regions");
-        // return 0;
+        return 0;
       }
 
     }
@@ -135,18 +150,16 @@ public final class FilmQuery {
 
     // put in unsorted list
     LinkedList<String> unsortedResults = new LinkedList<String>();
-    for (String result : results) {
-      unsortedResults.add(result);
-    }
+    unsortedResults.addAll(results);
 
     // sort these
-    Collections.sort(unsortedResults, new AutocorrectComparator(search));
+    unsortedResults.sort(new AutocorrectComparator(search));
 
     int start = 0;
     StringBuilder sb = new StringBuilder();
 
     while (start < numResults && !unsortedResults.isEmpty()) {
-      sb.append(unsortedResults.removeLast() + "\n");
+      sb.append(unsortedResults.removeLast()).append("\n");
       start++;
     }
 
@@ -159,7 +172,8 @@ public final class FilmQuery {
   public void addAllNames() {
     try {
       String q = "SELECT DISTINCT primary_title FROM titles "
-          + "WHERE runtime_minutes > 5";
+          + "WHERE runtime_minutes > 4 AND region IS NOT NULL "
+          + "AND premiered IS NOT NULL AND ratings > 5 AND votes IS NOT NULL";
       PreparedStatement prep = conn.prepareStatement(q);
       ResultSet rs = prep.executeQuery();
       while (rs.next()) {
@@ -185,22 +199,16 @@ public final class FilmQuery {
       while (rs.next()) {
         if (rs.getString(1) != null) {
           String txt = rs.getString(1);
-          for (String piece : txt.split(",")) {
-            regionSet.add(piece);
-          }
-          // regions.add(rs.getString(1));
-          System.out.println(rs.getString(1));
+          regionSet.addAll(Arrays.asList(txt.split(",")));
         }
       }
       rs.close();
       prep.close();
 
-      for (String piece : regionSet) {
-        regions.add(piece);
-      }
+      regions.addAll(regionSet);
       Collections.sort(regions);
     } catch (SQLException e) {
-      System.out.println("ERROR: SQL Exception caught in addAllNames");
+      System.out.println("ERROR: SQL Exception caught in allAllRegions");
     }
   }
 }

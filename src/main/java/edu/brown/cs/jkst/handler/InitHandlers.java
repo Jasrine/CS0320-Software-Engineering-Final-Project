@@ -32,9 +32,14 @@ public final class InitHandlers {
       List<String> regions = FilmQuery.getRegions();
       List<String> genres = FilmQuery.getGenres();
       List<String> decades = FilmQuery.getDecades();
-      Map<String, Object> variables = ImmutableMap.of("title",
-          "Film suggestions", "suggestions", "\n", "regions", regions,
-          "decades", decades, "genres", genres);
+      List<String> services = FilmQuery.getServices();
+      Map<String, Object> variables = new ImmutableMap.Builder<String, Object>()
+          .put("title", "Film suggestions")
+          .put("suggestions", "\n")
+          .put("regions", regions)
+          .put("genres", genres)
+          .put("services", services)
+          .put("decades", decades).build();
       return GSON.toJson(variables);
     }
   }
@@ -48,9 +53,14 @@ public final class InitHandlers {
       List<String> regions = FilmQuery.getRegions();
       List<String> genres = FilmQuery.getGenres();
       List<String> decades = FilmQuery.getDecades();
-      Map<String, Object> variables = ImmutableMap.of("title",
-          "Film suggestions", "suggestions", "\n", "regions", regions,
-          "decades", decades, "genres", genres);
+      List<String> services = FilmQuery.getServices();
+      Map<String, Object> variables = new ImmutableMap.Builder<String, Object>()
+          .put("title", "Film suggestions")
+          .put("suggestions", "\n")
+          .put("regions", regions)
+          .put("genres", genres)
+          .put("services", services)
+          .put("decades", decades).build();
       return new ModelAndView(variables, "main.ftl");
     }
   }

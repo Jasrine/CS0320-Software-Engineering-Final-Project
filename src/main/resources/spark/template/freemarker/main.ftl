@@ -70,9 +70,12 @@
     </style>
 </head>
 <body>
+    
+
     <div class="outer" id="outer">
         <div class="index" id="index">
 
+            <div class="loading style-2" id="loading style-2"><div class="loading-wheel"></div></div>
             Enter a possible film title:<br>
             <input type="text" id="search" name="search"><br>
             <ol name="suggestions" id="suggestions"></ol>
@@ -93,6 +96,11 @@
             &/or belonging to a genre:
             <select name="genres" id="genres">
                 <option value="0">Select a genre.</option>
+            </select><br>
+
+            &/or from a streaming service:
+            <select name="services" id="services">
+                <option value="0">Select a streaming service.</option>
             </select><br>
             Here are suggestions:<br>
 

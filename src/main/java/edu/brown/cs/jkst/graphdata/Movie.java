@@ -8,11 +8,12 @@ import java.util.TreeSet;
 /**
  * class describing a film node, implements our node interface.
  */
-public class Movie implements Node<Movie, MEdge> {
+public class Movie implements Node<Movie, MEdge>, Comparable<Movie> {
 
   private String id;
   private String filmName;
   private String director;
+  private String img;
   private int year;
   private List<String> genres;
   private List<String> crew;
@@ -20,6 +21,7 @@ public class Movie implements Node<Movie, MEdge> {
   private Set<MEdge> edges;
   private double rating;
   private int numVotes;
+  private double rawRanking;
 
   /**
    * Constructor for Movie node.
@@ -30,6 +32,8 @@ public class Movie implements Node<Movie, MEdge> {
    *          String name for displaying the film.
    * @param director
    *          String id for director.
+   * @param imgURL
+   *          String containing a url for displaying the image if it exists.
    * @param year
    *          number specifying the year in which it premiered.
    * @param genres
@@ -37,26 +41,48 @@ public class Movie implements Node<Movie, MEdge> {
    * @param regions
    *          List of regions in which the film is available.
    * @param rating
-   *          double between 0 and 10 giving the film's IMDB rating.
+   *          Rating of the movie
    * @param numVotes
-   *          int number of votes contributing to the rating.
+   *          Number of people who contributed to the rating
    */
-  public Movie(String id, String filmName, String director,
+  public Movie(String id, String filmName, String director, String imgURL,
       int year, List<String> genres, List<String> regions,
       double rating, int numVotes) {
     this.id = id;
     this.filmName = filmName;
     this.director = director;
+    this.img = imgURL;
     this.year = year;
     this.genres = genres;
     this.regions = regions;
     this.rating = rating;
     this.numVotes = numVotes;
+    this.rawRanking = this.rawRank();
   }
 
   @Override
   public String getNodeId() {
     return this.id;
+  }
+
+  /**
+   * sets rating to a given value.
+   *
+   * @param rating
+   *          to set the movie rating to.
+   */
+  public void setRating(double rating) {
+    this.rating = rating;
+  }
+
+  /**
+   * sets rating to a given value.
+   *
+   * @param numvotes
+   *          to set the movie rating to.
+   */
+  public void setVotes(int numvotes) {
+    this.numVotes = numvotes;
   }
 
   @Override
@@ -129,24 +155,96 @@ public class Movie implements Node<Movie, MEdge> {
     return this.numVotes;
   }
 
+  // TODO: raw ranking for searches that are NOT by similarity
+  /*
+   * Design Notes: - Computed once and (should be) stored to improve speed. -
+   */
+  public double rawRank() {
+    return this.rating * (this.numVotes / 100.f);
+    // double dataCompleteness = 0.f; //TODO: Number of fields that contain
+    // information
+    // double yearScore = 0.f;
+    // double rating = this.rating;
+    // if (this.filmName != null) {
+    // dataCompleteness++;
+    // }
+    // if (this.director!= null) {
+    // dataCompleteness++;
+    // }
+    // if (this.year != 0) {
+    // dataCompleteness++;
+    // yearScore = (double)(this.year - 1870);
+    // }
+    // if (this.genres != null && !this.genres.isEmpty()) {
+    // dataCompleteness++;
+    // }
+    // if (this.crew != null && !this.crew.isEmpty()) {
+    // dataCompleteness++;
+    // }
+    // if (this.regions != null && !this.regions.isEmpty()) {
+    // dataCompleteness++;
+    // }
+    // if (this.rating != 0.0) {
+    // dataCompleteness++;
+    // }
+    //
+    //
+    // // The oldest movie on IMDB is from 1874, so subtracting 1870 from the
+    // date
+    // // of release gives a normalized score that's higher the more current the
+    // // movie is.
+    // double awardsWon = 0.f; //TODO: if we have this data, number of awards
+    // won
+    //
+    // return Math.sqrt(dataCompleteness*dataCompleteness + yearScore*yearScore
+    // + rating*rating);
+  }
+
+  /**
+   * getter for the image url.
+   *
+   * @return String that contains a link to the image if it exists.
+   */
+  public String getImageURL() {
+    return this.img;
+  }
+
+  // public double searchRelevancy(String title, String decade, String region,
+  // String genres) {
+  // if (this.)
+  // //1. measure title similarity
+  // //2. measure release date similarity
+  // //3. measure region similarity
+  // //4. measure genre similarity
+  // }
+
+  /**
+   * @param movies
+   *          a Set of Movies to compare this Movie against.
+   * @return a TreeSet of the same Movies reordered based on similarity to this
+   *         movie.
+   */
   public Set<Movie> suggest(Set<Movie> movies) {
-    Set<Movie> suggestions = new TreeSet<>(Comparator.comparingDouble(
-        this::scoreSimilarity));
+    Set<Movie> suggestions = new TreeSet<>(
+        Comparator.comparingDouble(this::scoreSimilarity));
     suggestions.addAll(movies);
     return suggestions;
   }
 
   /**
-   * Very simple way to decide the following: how similar are these movies?
-   * 
+   * Given a Movie, returns a number scoring how relatively similar that Movie
+   * is to this Movie.
+   *
+   * @param m
+   *          a Movie that is potentially similar to this Movie.
    * @return a score indicating how similar the two movies are predicted to be.
    *         Higher score indicates more similarities. Factors considered
    *         include director, genre(s) according to IMDB, rating according to
    *         IMDB, ...
    */
-  public double scoreSimilarity(Movie that) {
+  public double scoreSimilarity(Movie m) {
     double directorScore = 0.0;
-    if (this.director.equals(that.director)) {
+    if (this.director.equals(m.director)) {
       directorScore = 1.0;
     }
 
@@ -154,11 +252,11 @@ public class Movie implements Node<Movie, MEdge> {
     // TODO: consider accounting for the varying tones in the actual genres
     double genreScore = 0.0;
     String AA = this.genres.get(0);
-    String aa = that.genres.get(0);
+    String aa = m.genres.get(0);
     String BB = this.genres.get(1);
-    String bb = that.genres.get(1);
+    String bb = m.genres.get(1);
     String CC = this.genres.get(2);
-    String cc = that.genres.get(2);
+    String cc = m.genres.get(2);
     boolean isOverlap1 = true;
     if (aa.equals(AA)) {
       genreScore += 39.0;
@@ -200,8 +298,8 @@ public class Movie implements Node<Movie, MEdge> {
     // to be. This could be modified so that if the OTHER movie is rated higher
     // the "similarity" is inflated, making the "better" movie a more appealing
     // suggestion.
-    double ratingScore = 1.0 - (Math.abs(this.rating - that.rating) * 0.1);
-    // TODO: is the rating more or less meaningful depending on numVotes?
+    double ratingScore = 1.0 - (Math.abs(this.rating - m.rating) * 0.1);
+    // TODO: normalize ratings by genre?
 
     // TODO: crewScore (similar to genre score but with no weight on order?)
     // TODO: regionScore (positive or negative depending on preference?)
@@ -216,12 +314,18 @@ public class Movie implements Node<Movie, MEdge> {
 
   @Override
   public String toString() {
+    StringBuilder regionSb = new StringBuilder();
+    for (String region : this.regions) {
+      regionSb.append(region + ", ");
+    }
+    String regionStr = regionSb.substring(0, regionSb.length() - 2);
+
     StringBuilder sb = new StringBuilder();
     sb.append("Film name: " + this.filmName + "\n");
     sb.append("Director: " + this.director + "\n");
     sb.append("Year: " + this.year + "\n");
     sb.append("Genres: " + this.genres.toString() + "\n");
-    sb.append("Regions: " + this.regions.toString() + "\n");
+    sb.append("Regions: " + regionStr + "\n");
     return sb.toString();
   }
 
@@ -234,5 +338,55 @@ public class Movie implements Node<Movie, MEdge> {
   public boolean equals(Object o) {
     Movie con = (Movie) o;
     return this.id.equals(con.getNodeId());
+  }
+
+  /**
+   * Compares this object with the specified object for order. Returns a
+   * negative integer, zero, or a positive integer as this object is less than,
+   * equal to, or greater than the specified object.
+   * <p>
+   * <p>
+   * The implementor must ensure <tt>sgn(x.compareTo(y)) ==
+   * -sgn(y.compareTo(x))</tt> for all <tt>x</tt> and <tt>y</tt>. (This implies
+   * that <tt>x.compareTo(y)</tt> must throw an exception iff
+   * <tt>y.compareTo(x)</tt> throws an exception.)
+   * <p>
+   * <p>
+   * The implementor must also ensure that the relation is transitive:
+   * <tt>(x.compareTo(y)&gt;0 &amp;&amp; y.compareTo(z)&gt;0)</tt> implies
+   * <tt>x.compareTo(z)&gt;0</tt>.
+   * <p>
+   * <p>
+   * Finally, the implementor must ensure that <tt>x.compareTo(y)==0</tt>
+   * implies that <tt>sgn(x.compareTo(z)) == sgn(y.compareTo(z))</tt>, for all
+   * <tt>z</tt>.
+   * <p>
+   * <p>
+   * It is strongly recommended, but <i>not</i> strictly required that
+   * <tt>(x.compareTo(y)==0) == (x.equals(y))</tt>. Generally speaking, any
+   * class that implements the <tt>Comparable</tt> interface and violates this
+   * condition should clearly indicate this fact. The recommended language is
+   * "Note: this class has a natural ordering that is inconsistent with equals."
+   * <p>
+   * <p>
+   * In the foregoing description, the notation
+   * <tt>sgn(</tt><i>expression</i><tt>)</tt> designates the mathematical
+   * <i>signum</i> function, which is defined to return one of <tt>-1</tt>,
+   * <tt>0</tt>, or <tt>1</tt> according to whether the value of
+   * <i>expression</i> is negative, zero or positive.
+   *
+   * @param o
+   *          the object to be compared.
+   * @return a negative integer, zero, or a positive integer as this object is
+   *         less than, equal to, or greater than the specified object.
+   * @throws NullPointerException
+   *           if the specified object is null
+   * @throws ClassCastException
+   *           if the specified object's type prevents it from being compared to
+   *           this object.
+   */
+  @Override
+  public int compareTo(Movie o) {
+    return Double.compare(this.rawRanking, o.rawRanking);
   }
 }

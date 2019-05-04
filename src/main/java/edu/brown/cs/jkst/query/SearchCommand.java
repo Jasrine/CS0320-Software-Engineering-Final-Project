@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -39,11 +40,13 @@ public final class SearchCommand implements Command {
    *          of film.
    * @param genres
    *          which we wish to include in our search.
+   * @param service
+   *          which the movie should be available on.
    *
    * @return query for getting the right movies.
    */
   public String getQuery(String title, String decade, String region,
-      String genres) {
+      String genres, String service) {
     String queryString = "SELECT DISTINCT * FROM titles WHERE ";
     StringBuilder sb = new StringBuilder();
     sb.append(queryString);
@@ -57,16 +60,12 @@ public final class SearchCommand implements Command {
 
     if (decade != null && decade.length() > 0) {
       try {
-        int decStart = Integer.parseInt(decade.substring(0, decade.length()
-            - 1));
-        int decEnd = decStart + DEC;
-        String decPart = "premiered > ? AND premiered < ? ";
+        String decPart = "premiered >= ? AND premiered <= ? ";
         if (connect) {
-          sb.append("OR " + decPart);
+          sb.append("AND ").append(decPart);
         } else {
           sb.append(decPart);
         }
-
         connect = true;
       } catch (Exception e) {
         e.printStackTrace();
@@ -76,7 +75,7 @@ public final class SearchCommand implements Command {
     if (region != null && region.length() > 0) {
       String regionPart = "region LIKE ? ";
       if (connect) {
-        sb.append("OR " + regionPart);
+        sb.append("AND ").append(regionPart);
       } else {
         sb.append(regionPart);
       }
@@ -85,9 +84,18 @@ public final class SearchCommand implements Command {
     if (genres != null && genres.length() > 0) {
       String genrePart = "genres LIKE ? ";
       if (connect) {
-        sb.append("OR " + genrePart);
+        sb.append("AND ").append(genrePart);
       } else {
         sb.append(genrePart);
+      }
+    }
+
+    if (service != null && service.length() > 0) {
+      String servicePart = "streaming_services LIKE ?";
+      if (connect) {
+        sb.append("AND ").append(servicePart);
+      } else {
+        sb.append(servicePart);
       }
     }
 
@@ -107,24 +115,25 @@ public final class SearchCommand implements Command {
    *          of film.
    * @param genres
    *          which we wish to include in our search.
+   * @param service
+   *          which people want to find a movie on.
    *
    * @return List of similar movies.
    */
   public List<Movie> search(String title, String decade, String region,
-      String genres) {
-    String queryString = getQuery(title, decade, region, genres);
+      String genres, String service) {
+    String queryString = getQuery(title, decade, region, genres, service);
     Connection conn = FilmQuery.getConn();
+    List<Movie> output = new LinkedList<>();
     if (conn != null) {
       try {
         PreparedStatement prep = conn.prepareStatement(queryString);
-
         // setting variables
         int counter = 0;
 
         if (title != null && title.length() > 0) {
-          String titlePart = "title LIKE ? ";
           counter++;
-          prep.setString(counter, title);
+          prep.setString(counter, "%" + title + "%");
         }
 
         if (decade != null && decade.length() > 0) {
@@ -132,7 +141,6 @@ public final class SearchCommand implements Command {
             int decStart = Integer.parseInt(decade.substring(0, decade.length()
                 - 1));
             int decEnd = decStart + DEC;
-
             counter++;
             prep.setInt(counter, decStart);
             counter++;
@@ -153,36 +161,48 @@ public final class SearchCommand implements Command {
         }
 
         ResultSet rs = prep.executeQuery();
-        List<Movie> output = new LinkedList<Movie>();
-        // Set<Movie> poss = new HashSet<Movie>();
 
         int numResults = 0;
         while (rs.next() && numResults < NUM_RESULTS) {
           String id = rs.getString(1);
           List<String> regions = Arrays.asList(rs.getString(2).split(","));
           String filmName = rs.getString(3);
-          String director = "";
+          String director = ""; // TODO: get actual director
           int year = rs.getInt(4);
           List<String> genreLst = Arrays.asList(rs.getString(6).split(","));
-          Movie m = new Movie(id, filmName, director, year, genreLst, regions);
+          double rating;
+          String rate = rs.getString(7);
+          if (rs.wasNull()) {
+            rating = 0.0;
+          } else {
+            try {
+              rating = Double.parseDouble(rate);
+            } catch (NumberFormatException e) {
+              rating = 0.0;
+            }
+          }
+          int numVotes = rs.getInt(8);
+          if (rs.wasNull()) {
+            numVotes = 0;
+          }
+          String url = rs.getString(9);
+          Movie m = new Movie(id, filmName, director, url, year, genreLst,
+              regions, rating, numVotes);
 
           // poss.add(m);
           output.add(m);
-          System.out.println(m.toString());
+          // System.out.println(m.toString());
           numResults++;
         }
         rs.close();
         prep.close();
 
-        // Collections.sort(output);
-
-        return output;
       } catch (SQLException e) {
         e.printStackTrace();
       }
-
     }
-
-    return new LinkedList<Movie>();
+    Collections.sort(output);
+    Collections.reverse(output);
+    return output;
   }
 }
