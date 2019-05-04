@@ -114,7 +114,6 @@ public final class SearchCommand implements Command {
       String genres) {
     String queryString = getQuery(title, decade, region, genres);
     Connection conn = FilmQuery.getConn();
-
     if (conn != null) {
       try {
         PreparedStatement prep = conn.prepareStatement(queryString);

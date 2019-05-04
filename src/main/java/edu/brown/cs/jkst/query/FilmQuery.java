@@ -90,7 +90,8 @@ public final class FilmQuery {
   public int createConnection() {
     try {
       Class.forName("org.sqlite.JDBC");
-      conn = DriverManager.getConnection("jdbc:sqlite:data/imdb5.db");
+      conn = DriverManager.getConnection(
+          "jdbc:sqlite:data/imdb5.db");
       Statement stat = conn.createStatement();
       stat.executeUpdate("PRAGMA foreign_keys = ON;");
 
