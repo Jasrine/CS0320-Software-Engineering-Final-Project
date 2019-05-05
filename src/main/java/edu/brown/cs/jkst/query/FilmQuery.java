@@ -16,6 +16,18 @@ import edu.brown.cs.jkst.trie.Trie;
  * class that handles many SQL queries for the application.
  */
 public final class FilmQuery {
+  public static int ONE = 1;
+  public static int TWO = 2;
+  public static int THREE = 3;
+  public static int FOUR = 4;
+  public static int FIVE = 5;
+  public static int SIX = 6;
+  public static int SEVEN = 7;
+  public static int EIGHT = 8;
+  public static int NINE = 9;
+  public static int TEN = 10;
+  public static int ELEVEN = 11;
+  public static int TWELVE = 12;
   public static final FilmQuery INSTANCE = new FilmQuery();
   private static Trie<Character> trie = new Trie<Character>();
   private static List<String> regions = new LinkedList<String>();
@@ -246,33 +258,32 @@ public final class FilmQuery {
                                       Comparator<Movie> comp,
                                       int max_num_results) throws SQLException {
     List<Movie> output = new LinkedList<>();
-
-    long t0 = System.currentTimeMillis();
     ResultSet rs = prep.executeQuery();
-    PriorityQueue<Movie> bestMovies = new PriorityQueue<>(100, comp);
+    PriorityQueue<Movie> bestMovies
+            = new PriorityQueue<>(max_num_results, comp);
     int numResults = 0;
     while (rs.next()) {
-      String id = rs.getString(1);
+      String id = rs.getString(ONE);
       //TODO: this is where we'd get the movie from the cache, if we had one
-      String regionsRaw = rs.getString(2);
+      String regionsRaw = rs.getString(TWO);
       if (rs.wasNull()) {
         regionsRaw = "";
       }
       List<String> regions = Arrays.asList(regionsRaw.split(","));
-      String filmName = rs.getString(3);
+      String filmName = rs.getString(THREE);
       if (rs.wasNull()) {
         filmName = "";
       }
-      int year = rs.getInt(4);
+      int year = rs.getInt(FOUR);
       if (rs.wasNull()) {
         year = 0;
       }
-      List<String> genreLst = Arrays.asList(rs.getString(6).split(","));
+      List<String> genreLst = Arrays.asList(rs.getString(SIX).split(","));
       if (rs.wasNull()) {
         genreLst = Collections.emptyList();
       }
       double rating;
-      String rate = rs.getString(7);
+      String rate = rs.getString(SEVEN);
       if (rs.wasNull()) {
         rating = 0.0;
       } else {
@@ -282,15 +293,22 @@ public final class FilmQuery {
           rating = 0.0;
         }
       }
-      int numVotes = rs.getInt(8);
+      int numVotes = rs.getInt(EIGHT);
       if (rs.wasNull()) {
         numVotes = 0;
       }
       Movie m = new Movie(id, filmName, year, genreLst,
               regions, rating, numVotes);
-      String url = rs.getString(9);
+      String url = rs.getString(NINE);
       if (!rs.wasNull()) {
         m.setImgURL(url);
+      }
+      String director = rs.wasNull() ? "" : rs.getString(ELEVEN);
+      m.setDirector(director);
+
+      String cast = rs.wasNull() ? "" : rs.getString(TWELVE);
+      if (cast != null) {
+        m.setCast(cast.split(","));
       }
       if (numResults < max_num_results) {
         bestMovies.add(m);
@@ -305,8 +323,6 @@ public final class FilmQuery {
     assert bestMovies.size() <= max_num_results;
     output.addAll(bestMovies);
     Collections.reverse(output);
-    long t1 = System.currentTimeMillis();
-    System.out.println("TIME: " + ((t1 - t0) * 0.001));
     return output;
   }
 
