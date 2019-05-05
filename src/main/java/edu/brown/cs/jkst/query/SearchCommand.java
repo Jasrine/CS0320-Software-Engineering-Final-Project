@@ -22,10 +22,12 @@ public final class SearchCommand implements Command {
   private static final int NUM_RESULTS = 100;
 
   @Override
-  public void execute(String line, PrintWriter pw, Boolean repl) {
+  public String execute(String line, PrintWriter pw, Boolean repl) {
     // returns films similar to the selected film
     // also has to route to advanced search, and then ranker
+
     pw.println("No results found.");
+    return "";
   }
 
   /**
@@ -189,9 +191,7 @@ public final class SearchCommand implements Command {
           Movie m = new Movie(id, filmName, director, url, year, genreLst,
               regions, rating, numVotes);
 
-          // poss.add(m);
           output.add(m);
-          // System.out.println(m.toString());
           numResults++;
         }
         rs.close();
