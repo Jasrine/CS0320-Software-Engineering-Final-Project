@@ -1,40 +1,54 @@
 package edu.brown.cs.jkst.query;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
+import java.sql.SQLException;
 
 import org.junit.Test;
 
+/**
+ * class with methods for testing Film Query functionality.
+ */
 public class FilmQueryTest {
+  private static final int REGION_SIZE = 235;
+  private static final int DECADE_NUM = 13;
+  private static final int SERVICE_NUM = 11;
+  private static final int GENRE_NUM = 22;
 
+  /**
+   * class that tests whether connections are created and closed properly.
+   */
   @Test
   public void testConnection() {
-    assertTrue(FilmQuery.INSTANCE.getConn() == null);
+    try {
+      assertTrue(FilmQuery.INSTANCE.getConn().isClosed());
+    } catch (SQLException e) {
+      System.out.println("Error encountered in FilmQueryTest");
+    }
     FilmQuery.INSTANCE.createConnection();
-    assertTrue(FilmQuery.getConn() != null);
-    assertTrue(FilmQuery.getConn() != null);
-    assertTrue(FilmQuery.INSTANCE.getRegions().size() == 235);
-    assertTrue(FilmQuery.INSTANCE.getDecades().size() == 13);
-    assertTrue(FilmQuery.INSTANCE.getServices().size() == 10);
-    assertTrue(FilmQuery.INSTANCE.getGenres().size() == 22);
+    assertTrue(FilmQuery.INSTANCE.getConn() != null);
+    assertTrue(FilmQuery.INSTANCE.getConn() != null);
+    assertEquals(FilmQuery.INSTANCE.getRegions().size(), REGION_SIZE);
+    assertEquals(FilmQuery.getDecades().size(), DECADE_NUM);
+    assertEquals(FilmQuery.getServices().size(), SERVICE_NUM);
+    assertEquals(FilmQuery.getGenres().size(), GENRE_NUM);
     FilmQuery.INSTANCE.closeConnection();
   }
 
+  /**
+   * class that tests find suggestion.
+   */
   @Test
   public void testFindSuggestion() {
     FilmQuery.INSTANCE.createConnection();
-    assertTrue(FilmQuery.INSTANCE.findSuggestion("Bat").trim().equals("Bat\n" +
-        "Zaw\n" +
-        "Zap\n" +
-        "Yap\n" +
-        "Yao"));
-    assertTrue(FilmQuery.INSTANCE.findSuggestion("Avenge").trim().equals(
-        "Avenge\n" +
-            "Revenge\n" +
-            "Avenues\n" +
-            "Avengers: Infinity War\n" +
-            "Avengers: Age of Ultron"));
-    assertTrue(FilmQuery.INSTANCE.findSuggestion("bvhgdved hkwbiw").trim()
-        .equals(""));
+    assertEquals(FilmQuery.INSTANCE.findSuggestion("Bat").trim(), "Bat\n"
+        + "Zaw\nZap\nYap\nYao");
+    assertEquals(FilmQuery.INSTANCE.findSuggestion("Avenge").trim(),
+        "Avenge\nRevenge\nAvenues\n"
+            + "Avengers: Infinity War\nAvengers: Age of Ultron");
+    assertEquals(FilmQuery.INSTANCE.findSuggestion("bvhgdved hkwbiw").trim(),
+        "");
     FilmQuery.INSTANCE.closeConnection();
   }
 }

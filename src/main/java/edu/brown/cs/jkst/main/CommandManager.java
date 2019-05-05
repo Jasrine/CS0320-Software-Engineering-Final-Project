@@ -96,6 +96,7 @@ public class CommandManager {
      * @param repl
      *          Boolean which indicates whether execution is printing in the
      *          commandline, or sending output to a handler.
+     * @return String representation of output for testing.
      */
     String execute(String line, PrintWriter pw, Boolean repl);
   }

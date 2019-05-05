@@ -45,21 +45,6 @@
             height: 25px; 
             width: 500px;
         }
-        .ui-widget-content {
-            cursor: pointer;
-            white-space: pre;
-            text-align: center;
-            vertical-align: center;
-            background: #DA70D6;
-            border: 1px solid #9370DB;
-            color: #333333;
-        }
-        .ui-widget-content .selected {
-            color: #9932CC
-        }
-        .ui-widget-content:active {
-            color: #9932CC
-        }
 
         #selectable li .hover {
             color: #BA55D3
@@ -84,15 +69,10 @@
                 <option value="0">Select a decade.</option>
             </select><br>
 
-    <!--         <div class="column1"> -->
-                Regions:
-<!--             </div>
-            <div class="column2"> -->
+            Regions:
             <select name="regions" id="regions">
                 <option value="0">Select a region.</option>
             </select><br>
-        <!-- </div><br>
- -->
             &/or belonging to a genre:
             <select name="genres" id="genres">
                 <option value="0">Select a genre.</option>
@@ -104,12 +84,7 @@
             </select><br>
             Here are suggestions:<br>
 
-            <ol name="searchResults" id="searchResults">
-            </ol>
-            <!-- <select name="suggestions" id="suggestions" size="5">
-            </select>
-     --><!-- 
-            <textarea name="suggestions" id="suggestions"></textarea> -->
+            <ol name="searchResults" id="searchResults"></ol>
             <p style="white-space: nowrap;"> <a href="/contact">Contact us</a> <a href="/about">About us</a> <a href="/faq">Anticipated Questions</a></p>
         </div>
     </div>

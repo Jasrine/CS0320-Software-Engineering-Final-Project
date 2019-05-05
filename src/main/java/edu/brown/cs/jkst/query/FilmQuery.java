@@ -6,12 +6,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import edu.brown.cs.jkst.trie.AutocorrectComparator;
@@ -36,14 +37,19 @@ public final class FilmQuery {
       "1890s", "1900s", "1910s", "1920s", "1930s", "1940s", "1950s",
       "1960s", "1970s", "1980s", "1990s", "2000s", "2010s"
   };
-
   private static String[] services = {
       "Netflix", "Hulu", "Amazon Prime Video", "Showtime", "Sundance TV",
-      "Epix", "Starz", "Hallmark", "Free Online Streaming Services", "HBO"
+      "Epix", "Starz", "Hallmark", "Free Online Streaming Services", "HBO",
+      "MUBI"
+  };
+  private static String[] serviceDB = {
+      "Netflix", "Hulu", "PrimeVideo", "Showtime", "Sundance",
+      "Epix", "Starz", "Hallmark", "Free", "HBO", "MUBI"
   };
   private static List<String> genreList = Arrays.asList(genres);
   private static List<String> decadeList = Arrays.asList(decades);
   private static List<String> serviceList = Arrays.asList(services);
+  private static Map<String, String> serviceMap = new HashMap<String, String>();
 
   /**
    * Constructor for FilmQuery.
@@ -67,12 +73,9 @@ public final class FilmQuery {
     try {
       conn.close();
     } catch (SQLException e) {
-      System.out.println("SQL connection problem in closing!");
+      System.out.println("ERROR: SQL connection problem in closing!");
     }
-    regions = new ArrayList<String>();
-    decadeList = new ArrayList<String>();
-    serviceList = new ArrayList<String>();
-    genreList = new ArrayList<String>();
+    regions = new LinkedList<String>();
   }
 
   /**
@@ -102,6 +105,24 @@ public final class FilmQuery {
    */
   public static List<String> getServices() {
     return serviceList;
+  }
+
+  /**
+   * getter for the list of services the user can choose from in advanced
+   * search.
+   *
+   * @return List of String with streaming services we have information for.
+   */
+  public static Map<String, String> getServiceMap() {
+    if (serviceMap.keySet().isEmpty()) {
+      int i = 0;
+      for (String serviceDisplay : serviceList) {
+        serviceMap.put(serviceDisplay, serviceDB[i]);
+        i++;
+      }
+    }
+
+    return serviceMap;
   }
 
   /**

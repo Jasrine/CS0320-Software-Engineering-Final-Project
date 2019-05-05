@@ -7,8 +7,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.PriorityQueue;
 
 import edu.brown.cs.jkst.graphdata.Movie;
 import edu.brown.cs.jkst.main.CommandManager.Command;
@@ -18,8 +21,12 @@ import edu.brown.cs.jkst.main.CommandManager.Command;
  */
 public final class SearchCommand implements Command {
   public static final SearchCommand INSTANCE = new SearchCommand();
+  private static final int SEVEN = 7;
+  private static final int EIGHT = 8;
+  private static final int NINE = 9;
   private static final int DEC = 10;
   private static final int NUM_RESULTS = 100;
+  private static Map<String, String> serviceMap = FilmQuery.getServiceMap();
 
   @Override
   public String execute(String line, PrintWriter pw, Boolean repl) {
@@ -49,9 +56,9 @@ public final class SearchCommand implements Command {
    */
   public String getQuery(String title, String decade, String region,
       String genres, String service) {
-    String queryString = "SELECT DISTINCT * FROM titles WHERE ";
+    String queryString = "SELECT DISTINCT * FROM titles";
+    StringBuilder sbFull = new StringBuilder(queryString);
     StringBuilder sb = new StringBuilder();
-    sb.append(queryString);
     boolean connect = false;
 
     if (title != null && title.length() > 0) {
@@ -62,7 +69,7 @@ public final class SearchCommand implements Command {
 
     if (decade != null && decade.length() > 0) {
       try {
-        String decPart = "premiered >= ? AND premiered <= ? ";
+        String decPart = "premiered BETWEEN ? AND ? ";
         if (connect) {
           sb.append("AND ").append(decPart);
         } else {
@@ -100,8 +107,11 @@ public final class SearchCommand implements Command {
         sb.append(servicePart);
       }
     }
-
-    return sb.toString();
+    if (connect) {
+      sbFull.append(" WHERE ").append(sb);
+    }
+    System.out.println(sbFull.toString());
+    return sbFull.toString();
   }
 
   /**
@@ -124,6 +134,7 @@ public final class SearchCommand implements Command {
    */
   public List<Movie> search(String title, String decade, String region,
       String genres, String service) {
+    long t0 = System.currentTimeMillis();
     String queryString = getQuery(title, decade, region, genres, service);
     Connection conn = FilmQuery.getConn();
     List<Movie> output = new LinkedList<>();
@@ -162,18 +173,38 @@ public final class SearchCommand implements Command {
           prep.setString(counter, "%" + genres + "%");
         }
 
+        if (service != null && service.length() > 0) {
+          counter++;
+          prep.setString(counter, "%" + this.serviceMap.get(service) + "%");
+        }
+
         ResultSet rs = prep.executeQuery();
 
+        PriorityQueue<Movie> bestMovies = new PriorityQueue<>(100);
+
         int numResults = 0;
-        while (rs.next() && numResults < NUM_RESULTS) {
+        while (rs.next()/* && numResults < NUM_RESULTS*/) {
           String id = rs.getString(1);
-          List<String> regions = Arrays.asList(rs.getString(2).split(","));
+          //TODO: this is where we'd get the movie from the cache, if we had one
+          String regionsRaw = rs.getString(2);
+          if (rs.wasNull()) {
+            regionsRaw = "";
+          }
+          List<String> regions = Arrays.asList(regionsRaw.split(","));
           String filmName = rs.getString(3);
-          String director = ""; // TODO: get actual director
+          if (rs.wasNull()) {
+            filmName = "";
+          }
           int year = rs.getInt(4);
+          if (rs.wasNull()) {
+            year = 0;
+          }
           List<String> genreLst = Arrays.asList(rs.getString(6).split(","));
+          if (rs.wasNull()) {
+            genreLst = Collections.emptyList();
+          }
           double rating;
-          String rate = rs.getString(7);
+          String rate = rs.getString(SEVEN);
           if (rs.wasNull()) {
             rating = 0.0;
           } else {
@@ -183,26 +214,76 @@ public final class SearchCommand implements Command {
               rating = 0.0;
             }
           }
-          int numVotes = rs.getInt(8);
+          int numVotes = rs.getInt(EIGHT);
           if (rs.wasNull()) {
             numVotes = 0;
           }
-          String url = rs.getString(9);
-          Movie m = new Movie(id, filmName, director, url, year, genreLst,
+          String url = rs.getString(NINE);
+          if (rs.wasNull()) {
+            url = "/css/images/Question-Mark.png";
+          }
+          Movie m = new Movie(id, filmName, url, year, genreLst,
               regions, rating, numVotes);
 
-          output.add(m);
-          numResults++;
+          if (numResults < 100) {
+            bestMovies.add(m);
+            numResults++;
+          } else if (m.compareTo(bestMovies.peek()) > 0){
+            bestMovies.poll();
+            bestMovies.add(m);
+            assert (bestMovies.size() == 100);
+          }
+
+//          output.add(m);
+//          numResults++;
         }
         rs.close();
         prep.close();
+        assert bestMovies.size() <= 100;
+        output.addAll(bestMovies);
+//        getCrew(output);
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
+    }
+//    Collections.sort(output);
+    Collections.reverse(output);
+    long t1 = System.currentTimeMillis();
+    System.out.println("TIME: " + ((t1 - t0) * 0.001));
+    return output;
+  }
+
+  /**
+   * helper method that gets and sets crew for a movie.
+   *
+   * @param moviesWithoutCrew
+   *          list of movies for which the crew has not been set.
+   * @return the same list of movies, with the crew set.
+   */
+  public List<Movie> getCrew(List<Movie> moviesWithoutCrew) {
+    String queryString = "SELECT * FROM crew WHERE title_id = ?";
+    Connection conn = FilmQuery.getConn();
+    if (conn != null) {
+      try {
+        for (Movie m : moviesWithoutCrew) {
+          PreparedStatement prep = conn.prepareStatement(queryString);
+          prep.setString(1, m.getNodeId());
+          ResultSet rs = prep.executeQuery();
+          Map<String, String> crew = new HashMap<String, String>();
+
+          while (rs.next()) {
+            crew.put(rs.getString(3), rs.getString(4));
+          }
+
+          m.setCrew(crew);
+          rs.close();
+          prep.close();
+        }
 
       } catch (SQLException e) {
         e.printStackTrace();
       }
     }
-    Collections.sort(output);
-    Collections.reverse(output);
-    return output;
+    return moviesWithoutCrew;
   }
 }
