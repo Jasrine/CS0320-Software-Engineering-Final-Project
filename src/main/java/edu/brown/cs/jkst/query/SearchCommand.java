@@ -25,6 +25,8 @@ public final class SearchCommand implements Command {
   private static final int EIGHT = 8;
   private static final int NINE = 9;
   private static final int DEC = 10;
+  private static final int ELEVEN = 11;
+  private static final int TWELVE = 12;
   private static final int NUM_RESULTS = 100;
   private static Map<String, String> serviceMap = FilmQuery.getServiceMap();
 
@@ -180,12 +182,11 @@ public final class SearchCommand implements Command {
 
         ResultSet rs = prep.executeQuery();
 
-        PriorityQueue<Movie> bestMovies = new PriorityQueue<>(100);
+        PriorityQueue<Movie> bestMovies = new PriorityQueue<>(NUM_RESULTS);
 
         int numResults = 0;
-        while (rs.next()/* && numResults < NUM_RESULTS*/) {
+        while (rs.next()/* && numResults < NUM_RESULTS */) {
           String id = rs.getString(1);
-          //TODO: this is where we'd get the movie from the cache, if we had one
           String regionsRaw = rs.getString(2);
           if (rs.wasNull()) {
             regionsRaw = "";
@@ -199,10 +200,12 @@ public final class SearchCommand implements Command {
           if (rs.wasNull()) {
             year = 0;
           }
+
           List<String> genreLst = Arrays.asList(rs.getString(6).split(","));
           if (rs.wasNull()) {
             genreLst = Collections.emptyList();
           }
+
           double rating;
           String rate = rs.getString(SEVEN);
           if (rs.wasNull()) {
@@ -214,39 +217,50 @@ public final class SearchCommand implements Command {
               rating = 0.0;
             }
           }
+
           int numVotes = rs.getInt(EIGHT);
           if (rs.wasNull()) {
             numVotes = 0;
           }
+
           String url = rs.getString(NINE);
           if (rs.wasNull()) {
             url = "/css/images/Question-Mark.png";
           }
-          Movie m = new Movie(id, filmName, url, year, genreLst,
+          Movie m = new Movie(id, filmName, year, genreLst,
               regions, rating, numVotes);
+          m.setImgURL(url);
 
-          if (numResults < 100) {
-            bestMovies.add(m);
-            numResults++;
-          } else if (m.compareTo(bestMovies.peek()) > 0){
-            bestMovies.poll();
-            bestMovies.add(m);
-            assert (bestMovies.size() == 100);
+          String director = rs.wasNull() ? "" : rs.getString(ELEVEN);
+          m.setDirector(director);
+
+          String cast = rs.wasNull() ? "" : rs.getString(TWELVE);
+          if (cast != null) {
+            m.setCast(cast.split(","));
           }
 
-//          output.add(m);
-//          numResults++;
+          if (numResults < NUM_RESULTS) {
+            bestMovies.add(m);
+            numResults++;
+          } else if (m.compareTo(bestMovies.peek()) > 0) {
+            bestMovies.poll();
+            bestMovies.add(m);
+            assert (bestMovies.size() == NUM_RESULTS);
+          }
+
+          // output.add(m);
+          // numResults++;
         }
         rs.close();
         prep.close();
-        assert bestMovies.size() <= 100;
+        assert bestMovies.size() <= NUM_RESULTS;
         output.addAll(bestMovies);
-//        getCrew(output);
+        // getCrew(output);
       } catch (SQLException e) {
         e.printStackTrace();
       }
     }
-//    Collections.sort(output);
+    // Collections.sort(output);
     Collections.reverse(output);
     long t1 = System.currentTimeMillis();
     System.out.println("TIME: " + ((t1 - t0) * 0.001));

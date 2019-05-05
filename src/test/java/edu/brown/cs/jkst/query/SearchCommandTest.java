@@ -21,7 +21,7 @@ public class SearchCommandTest {
   @Test
   public void testGetQuery() {
     String query1 = "SELECT DISTINCT * FROM titles WHERE primary_title LIKE ? "
-        + "AND premiered >= ? AND premiered <= ? AND region LIKE ? AND genres "
+        + "AND premiered BETWEEN ? AND ? AND region LIKE ? AND genres "
         + "LIKE ? AND streaming_services LIKE ?";
     String query2 = "SELECT DISTINCT * FROM titles WHERE primary_title LIKE ?";
     String query3 = "SELECT DISTINCT * FROM titles WHERE primary_title LIKE ? "

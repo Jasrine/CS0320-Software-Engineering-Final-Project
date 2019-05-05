@@ -11,7 +11,7 @@ import org.junit.Test;
  * class with methods for testing Film Query functionality.
  */
 public class FilmQueryTest {
-  private static final int REGION_SIZE = 235;
+  private static final int REGION_SIZE = 234;
   private static final int DECADE_NUM = 13;
   private static final int SERVICE_NUM = 11;
   private static final int GENRE_NUM = 22;

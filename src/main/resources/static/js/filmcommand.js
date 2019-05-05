@@ -18,13 +18,7 @@ class Film {
 		this.cast = cast;
 	}
 
-	renderFilmNode() {
-		// create node and add relevant information to it.
-	}
-
 	toString() {
-
-
 		let region = this.regions.join(", ");
 		let line = region;
 		let regionStr = "";
@@ -51,6 +45,9 @@ class Film {
 		}
 		if (regionStr != undefined && regionStr != null && regionStr.length > 0) {
 			resultStr += ("\n Regions: " + regionStr);
+		}
+		if (this.cast != undefined && this.cast != null && this.cast.length > 0) {
+			resultStr += ("\n Cast: " + this.cast.join(", "));
 		}
 
 		return resultStr;
@@ -229,7 +226,7 @@ $(document).ready(() => {
 					}
 					responseObject.results.forEach(suggestion => {
 						let f = new Film(suggestion.id, suggestion.filmName, suggestion.director, suggestion.genres,
-							suggestion.year, suggestion.regions, suggestion.img, "");
+							suggestion.year, suggestion.regions, suggestion.img, suggestion.cast);
 						const $node = document.createElement('p');
 						$node.setAttribute('class', 'film-widget');
 						$node.setAttribute('innerHTML', f.toString());

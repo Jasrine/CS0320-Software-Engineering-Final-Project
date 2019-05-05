@@ -1,6 +1,7 @@
 package edu.brown.cs.jkst.graphdata;
 
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -11,6 +12,8 @@ import java.util.TreeSet;
  */
 public class Movie implements Comparable<Movie> {
   private static final int DECADE = 10;
+  private static final int EARLIEST_YEAR = 1890;
+  private static final double NORMALIZE_INTERNAL_RATING = 100.f;
 
   private String id;
   private String filmName;
@@ -19,6 +22,7 @@ public class Movie implements Comparable<Movie> {
   private int year;
   private List<String> genres;
   private Map<String, String> crew;
+  private List<String> cast;
   private List<String> regions;
   private double rating;
   private int numVotes;
@@ -53,6 +57,7 @@ public class Movie implements Comparable<Movie> {
     this.regions = regions;
     this.rating = rating;
     this.numVotes = numVotes;
+    this.cast = new LinkedList<String>();
     this.rawRanking = this.rawRank();
   }
 
@@ -85,7 +90,20 @@ public class Movie implements Comparable<Movie> {
   }
 
   /**
+   * setter for cast.
+   *
+   * @param castMembers
+   *          array of strings with cast member names.
+   */
+  public void setCast(String[] castMembers) {
+    for (String castMember : castMembers) {
+      this.cast.add(castMember);
+    }
+  }
+
+  /**
    * gets the node id.
+   *
    * @return the node id.
    */
   public String getNodeId() {
@@ -94,7 +112,9 @@ public class Movie implements Comparable<Movie> {
 
   /**
    * sets rating to a given value.
-   * @param rating to set the movie rating to.
+   *
+   * @param rating
+   *          to set the movie rating to.
    */
   public void setRating(double rating) {
     this.rating = rating;
@@ -102,7 +122,9 @@ public class Movie implements Comparable<Movie> {
 
   /**
    * sets rating to a given value.
-   * @param numvotes to set the movie rating to.
+   *
+   * @param numvotes
+   *          to set the movie rating to.
    */
   public void setVotes(int numvotes) {
     this.numVotes = numvotes;
@@ -120,6 +142,7 @@ public class Movie implements Comparable<Movie> {
 
   /**
    * getter for director.
+   *
    * @return String of director's id.
    */
   public String getDirector() {
@@ -127,7 +150,18 @@ public class Movie implements Comparable<Movie> {
   }
 
   /**
+   * setter for director.
+   *
+   * @param director
+   *          String of director's name.
+   */
+  public void setDirector(String director) {
+    this.director = director;
+  }
+
+  /**
    * getter for genres.
+   *
    * @return list of strings indicating genre.
    */
   public List<String> getGenres() {
@@ -136,7 +170,9 @@ public class Movie implements Comparable<Movie> {
 
   /**
    * setter for crew.
-   * @param crew list of strings representing the crew.
+   *
+   * @param crew
+   *          list of strings representing the crew.
    */
   public void setCrew(Map<String, String> crew) {
     if (crew != null) {
@@ -147,6 +183,7 @@ public class Movie implements Comparable<Movie> {
 
   /**
    * getter for crew members.
+   *
    * @return list of strings indicating names of crew members.
    */
   public Map<String, String> getCrew() {
@@ -155,6 +192,7 @@ public class Movie implements Comparable<Movie> {
 
   /**
    * getter for regions in which the film is available.
+   *
    * @return list of strings indicating regions in which the film is available.
    */
   public List<String> getRegions() {
@@ -163,6 +201,7 @@ public class Movie implements Comparable<Movie> {
 
   /**
    * getter for film's rating.
+   *
    * @return film's current rating.
    */
   public double getRating() {
@@ -171,26 +210,21 @@ public class Movie implements Comparable<Movie> {
 
   /**
    * getter for number of votes on film.
+   *
    * @return film's current number of votes.
    */
   public int getNumVotes() {
     return this.numVotes;
   }
 
-  /**
-   * Getter for film's release year.
-   * @return film's release year
-   */
-  public int getYear() {
-    return this.year;
-  }
-
   // TODO: raw ranking for searches that are NOT by similarity
   /**
    * Design Notes: - Computed once and (should be) stored to improve speed. -
+   *
+   * @return double that indicates the raw rank.
    */
   public double rawRank() {
-    double dataCompleteness = 0.f; //TODO: Number of fields that contain information
+    double dataCompleteness = 0.f; // Number of nonempty fields
     double yearScore = 0.f;
     double ratingScore = 0.f;
     if (this.filmName != null) {
@@ -201,7 +235,7 @@ public class Movie implements Comparable<Movie> {
     }
     if (this.year != 0) {
       dataCompleteness++;
-      yearScore = (double)(this.year - 1870);
+      yearScore = this.year - EARLIEST_YEAR;
     }
     if (this.genres != null && !this.genres.isEmpty()) {
       dataCompleteness++;
@@ -216,21 +250,22 @@ public class Movie implements Comparable<Movie> {
       dataCompleteness++;
     }
     if (this.rating != 0.0) {
-      ratingScore = this.rating * (this.numVotes / 100.f);
+      ratingScore = this.rating * (this.numVotes / NORMALIZE_INTERNAL_RATING);
       dataCompleteness++;
     }
     // The oldest movie on IMDB is from 1874, so subtracting 1870 from the date
     // of release gives a normalized score that's higher the more current the
     // movie is.
-//    double awardsWon = 0.f; //TODO: if we have this data, number of awards won
+    // double awardsWon = 0.f; //TODO: if we have this data, number of awards
+    // won
     double compWeight = 1.f;
     double yearWeight = 1.f;
     double rateWeight = 1.5f;
     dataCompleteness *= compWeight;
     yearScore *= yearWeight;
     ratingScore *= rateWeight;
-    return dataCompleteness * Math.sqrt(yearScore*yearScore
-            + ratingScore*ratingScore);
+    return dataCompleteness * Math.sqrt(yearScore * yearScore
+        + ratingScore * ratingScore);
   }
 
   /**
@@ -242,16 +277,15 @@ public class Movie implements Comparable<Movie> {
     return this.img;
   }
 
-
-//  public double searchRelevancy(String title, String decade, String region,
-//                                String genres) {
-//    if (this.)
-//    //1. measure title similarity
-//    //2. measure release date similarity
-//    //3. measure region similarity
-//    //4. measure genre similarity
-// TODO: comparator extending class!!!
-// }
+  // public double searchRelevancy(String title, String decade, String region,
+  // String genres) {
+  // if (this.)
+  // //1. measure title similarity
+  // //2. measure release date similarity
+  // //3. measure region similarity
+  // //4. measure genre similarity
+  // TODO: comparator extending class!!!
+  // }
 
   /**
    * @param movies
@@ -326,7 +360,7 @@ public class Movie implements Comparable<Movie> {
       // adjust it so it's a scale of 0-100 (but first nonzero is 26)
       genreScore += 26.0;
     }
-    genreScore *= 0.01;
+    genreScore /= NORMALIZE_INTERNAL_RATING;
 
     // The smaller the difference in rating, the more similar the movies are
     // said
