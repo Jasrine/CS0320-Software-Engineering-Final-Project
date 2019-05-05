@@ -183,9 +183,10 @@ public final class SearchCommand implements Command {
         PriorityQueue<Movie> bestMovies = new PriorityQueue<>(100);
 
         int numResults = 0;
-        while (rs.next()/* && numResults < NUM_RESULTS*/) {
+        while (rs.next()/* && numResults < NUM_RESULTS */) {
           String id = rs.getString(1);
-          //TODO: this is where we'd get the movie from the cache, if we had one
+          // TODO: this is where we'd get the movie from the cache, if we had
+          // one
           String regionsRaw = rs.getString(2);
           if (rs.wasNull()) {
             regionsRaw = "";
@@ -222,31 +223,30 @@ public final class SearchCommand implements Command {
           if (rs.wasNull()) {
             url = "/css/images/Question-Mark.png";
           }
-          Movie m = new Movie(id, filmName, url, year, genreLst,
+          Movie m = new Movie(id, filmName, year, genreLst,
               regions, rating, numVotes);
-
           if (numResults < 100) {
             bestMovies.add(m);
             numResults++;
-          } else if (m.compareTo(bestMovies.peek()) > 0){
+          } else if (m.compareTo(bestMovies.peek()) > 0) {
             bestMovies.poll();
             bestMovies.add(m);
             assert (bestMovies.size() == 100);
           }
 
-//          output.add(m);
-//          numResults++;
+          // output.add(m);
+          // numResults++;
         }
         rs.close();
         prep.close();
         assert bestMovies.size() <= 100;
         output.addAll(bestMovies);
-//        getCrew(output);
+        // getCrew(output);
       } catch (SQLException e) {
         e.printStackTrace();
       }
     }
-//    Collections.sort(output);
+    // Collections.sort(output);
     Collections.reverse(output);
     long t1 = System.currentTimeMillis();
     System.out.println("TIME: " + ((t1 - t0) * 0.001));
