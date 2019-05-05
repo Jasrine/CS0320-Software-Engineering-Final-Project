@@ -5,7 +5,13 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.PriorityQueue;
 
 import edu.brown.cs.jkst.graphdata.Movie;
 import edu.brown.cs.jkst.main.CommandManager.Command;
@@ -20,6 +26,7 @@ public final class SearchCommand implements Command {
   private static final int NINE = 9;
   private static final int DEC = 10;
   private static final int NUM_RESULTS = 100;
+  private static Map<String, String> serviceMap = FilmQuery.getServiceMap();
 
   @Override
   public String execute(String line, PrintWriter pw, Boolean repl) {
@@ -164,6 +171,11 @@ public final class SearchCommand implements Command {
         if (genres != null && genres.length() > 0) {
           counter++;
           prep.setString(counter, "%" + genres + "%");
+        }
+
+        if (service != null && service.length() > 0) {
+          counter++;
+          prep.setString(counter, "%" + this.serviceMap.get(service) + "%");
         }
 
         ResultSet rs = prep.executeQuery();
