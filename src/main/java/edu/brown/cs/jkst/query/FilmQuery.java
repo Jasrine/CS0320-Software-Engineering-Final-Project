@@ -6,7 +6,16 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Set;
 
 import edu.brown.cs.jkst.graphdata.Movie;
 import edu.brown.cs.jkst.trie.AutocorrectComparator;
@@ -313,7 +322,7 @@ public final class FilmQuery {
       if (numResults < max_num_results) {
         bestMovies.add(m);
         numResults++;
-      } else if (m.compareTo(bestMovies.peek()) > 0){
+      } else if (m.compareTo(bestMovies.peek()) > 0) {
         bestMovies.poll();
         bestMovies.add(m);
       }

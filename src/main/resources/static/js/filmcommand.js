@@ -29,25 +29,35 @@ class Film {
 			regionStr = regionStr + piece.concat("\n");
 			line = line.substring(lastSpace + 1, line.length - 1);
 		}
-		
+
 		if (regionStr.length < 1) {
 			regionStr = region;
 		}
 		let resultStr = " Film title: " + this.title;
-		if (this.director.trim().length > 0) {
+		if (this.director != undefined && this.director != null && this.director.trim().length > 0) {
 			resultStr += ("\n Director: " + this.director);
 		}
-		if (this.genres.length > 0) {
+		if (this.genres != undefined && this.genres != null && this.genres.length > 0) {
 			resultStr += ("\n Genres: " + this.genres.join(", "));
 		}
 		if (parseInt(this.year) > 0) {
 			resultStr += ("\n Year in which this premiered: " + this.year);
 		}
 		if (regionStr != undefined && regionStr != null && regionStr.length > 0) {
-			resultStr += ("\n Regions: " + regionStr);
+			resultStr += ("\n Regions: " + regionStr.trim());
 		}
 		if (this.cast != undefined && this.cast != null && this.cast.length > 0) {
-			resultStr += ("\n Cast: " + this.cast.join(", "));
+			let castLine = this.cast.join(", ").trim();
+			let castStr = "";
+			while (castLine.length > 80) {
+				let piece = castLine.substring(0, 80);
+				let lastSpace = piece.lastIndexOf(", ");
+				piece = piece.substring(0, lastSpace);
+				castStr = castStr + piece.concat("\n");
+				castLine = castLine.substring(lastSpace + 1, line.length - 1);
+			}
+
+			resultStr += ("\n Cast: " + castStr.trim());
 		}
 
 		return resultStr;

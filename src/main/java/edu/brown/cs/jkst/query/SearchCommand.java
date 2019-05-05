@@ -5,13 +5,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.PriorityQueue;
 
 import edu.brown.cs.jkst.graphdata.Movie;
 import edu.brown.cs.jkst.main.CommandManager.Command;
@@ -101,7 +99,6 @@ public final class SearchCommand implements Command {
     if (connect) {
       sbFull.append(" WHERE ").append(sb);
     }
-    System.out.println(sbFull.toString());
     return sbFull.toString();
   }
 
@@ -131,7 +128,6 @@ public final class SearchCommand implements Command {
     if (conn != null) {
       try {
         PreparedStatement prep = conn.prepareStatement(queryString);
-        // setting variables
         int counter = 0;
 
         if (title != null && title.length() > 0) {
@@ -166,11 +162,11 @@ public final class SearchCommand implements Command {
         }
 
         output = FilmQuery.topMovies(prep, null, NUM_RESULTS);
-//        getCrew(output);
       } catch (SQLException e) {
-        e.printStackTrace();
+        System.out.println("SQL error!");
       }
     }
+    Collections.reverse(output);
     return output;
   }
 
@@ -202,7 +198,7 @@ public final class SearchCommand implements Command {
         }
 
       } catch (SQLException e) {
-        e.printStackTrace();
+        System.out.println("SQL error");
       }
     }
     return moviesWithoutCrew;

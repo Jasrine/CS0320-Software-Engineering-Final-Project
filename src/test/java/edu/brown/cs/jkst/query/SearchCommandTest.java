@@ -28,8 +28,6 @@ public class SearchCommandTest {
         + "AND genres LIKE ?";
     String query4 = "SELECT DISTINCT * FROM titles WHERE primary_title LIKE ? "
         + "AND region LIKE ?";
-    String query5 = "SELECT DISTINCT * FROM titles WHERE streaming_services "
-        + "LIKE ?";
     assertEquals(query2, SearchCommand.INSTANCE.getQuery("Carmencita", null,
         null, null, null).trim());
     assertEquals(query1, SearchCommand.INSTANCE.getQuery("Carmencita", "1900",
@@ -38,8 +36,6 @@ public class SearchCommandTest {
         null, "Action", null).trim());
     assertEquals(query4, SearchCommand.INSTANCE.getQuery("Carmencita", null,
         "Hungary,Greece,Russian Federation,United States", null, null).trim());
-    assertEquals(query5, SearchCommand.INSTANCE.getQuery(null, null,
-        null, null, "Hulu").trim());
   }
 
   /**

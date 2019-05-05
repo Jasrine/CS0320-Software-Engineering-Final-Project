@@ -309,7 +309,6 @@ public class Movie implements Comparable<Movie> {
     if (this.director.equals(m.director)) {
       directorScore = 1.0;
     }
-
     // consider averaging the genre similarity in both directions
     // consider accounting for the varying tones in the actual genres
     double genreScore = 0.0;

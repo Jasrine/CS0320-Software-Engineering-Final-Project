@@ -3,7 +3,9 @@ suggest
 search
 select
 OUTPUT
-ERROR:
-ERROR:
-ERROR:
+done loading in trie
+done loading in regions
+ERROR: no arguments passed into suggest
+ERROR: no arguments passed into search
+ERROR: no arguments passed into select
 END
