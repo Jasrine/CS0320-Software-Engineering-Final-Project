@@ -192,8 +192,11 @@ public final class SearchCommand implements Command {
             numVotes = 0;
           }
           String url = rs.getString(NINE);
-          Movie m = new Movie(id, filmName, url, year, genreLst,
+          Movie m = new Movie(id, filmName, year, genreLst,
               regions, rating, numVotes);
+          if (!rs.wasNull()) {
+            m.setImgURL(url);
+          }
 
           output.add(m);
           numResults++;
@@ -223,7 +226,6 @@ public final class SearchCommand implements Command {
     Connection conn = FilmQuery.getConn();
     if (conn != null) {
       try {
-
         for (Movie m : moviesWithoutCrew) {
           PreparedStatement prep = conn.prepareStatement(queryString);
           prep.setString(1, m.getNodeId());

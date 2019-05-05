@@ -10,6 +10,7 @@ import java.util.TreeSet;
  * class describing a film node, implements our node interface.
  */
 public class Movie implements Comparable<Movie> {
+  private static final int DECADE = 10;
 
   private String id;
   private String filmName;
@@ -30,8 +31,6 @@ public class Movie implements Comparable<Movie> {
    *          String id for uniquely identifying a movie.
    * @param filmName
    *          String name for displaying the film.
-   * @param imgURL
-   *          String containing a url for displaying the image if it exists.
    * @param year
    *          number specifying the year in which it premiered.
    * @param genres
@@ -43,18 +42,46 @@ public class Movie implements Comparable<Movie> {
    * @param numVotes
    *          Number of people who contributed to the rating
    */
-  public Movie(String id, String filmName, String imgURL, int year,
-      List<String> genres, List<String> regions, double rating, int numVotes) {
+  public Movie(String id, String filmName, int year, List<String> genres,
+      List<String> regions, double rating, int numVotes) {
     this.id = id;
     this.filmName = filmName;
     this.director = "";
-    this.img = imgURL;
+    this.img = "";
     this.year = year;
     this.genres = genres;
     this.regions = regions;
     this.rating = rating;
     this.numVotes = numVotes;
     this.rawRanking = this.rawRank();
+  }
+
+  /**
+   * getter for this film's name.
+   *
+   * @return film name.
+   */
+  public String getFilmname() {
+    return this.filmName;
+  }
+
+  /**
+   * getter for the year in which this film premiered.
+   *
+   * @return year of film premiere.
+   */
+  public int getYear() {
+    return this.year;
+  }
+
+  /**
+   * getter for the decade in which this film premiered.
+   *
+   * @return year of film premiere.
+   */
+  public String getDecade() {
+    int decStart = this.year - (this.year % DECADE);
+    return decStart + "s";
   }
 
   /**
@@ -84,6 +111,16 @@ public class Movie implements Comparable<Movie> {
    */
   public void setVotes(int numvotes) {
     this.numVotes = numvotes;
+  }
+
+  /**
+   * setter for the image url.
+   *
+   * @param imgURL
+   *          url to set for this movie class if any.
+   */
+  public void setImgURL(String imgURL) {
+    this.img = imgURL;
   }
 
   /**
