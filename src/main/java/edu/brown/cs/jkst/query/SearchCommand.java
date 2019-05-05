@@ -19,14 +19,8 @@ import edu.brown.cs.jkst.main.CommandManager.Command;
  */
 public final class SearchCommand implements Command {
   public static final SearchCommand INSTANCE = new SearchCommand();
-  private static final int SEVEN = 7;
-  private static final int EIGHT = 8;
-  private static final int NINE = 9;
   private static final int DEC = 10;
-  private static final int ELEVEN = 11;
-  private static final int TWELVE = 12;
   private static final int NUM_RESULTS = 100;
-  private static final double MILI = 0.001;
   private static Map<String, String> serviceMap = FilmQuery.getServiceMap();
 
   @Override
@@ -36,6 +30,14 @@ public final class SearchCommand implements Command {
 
     pw.println("No results found.");
     return "";
+  }
+
+  private void appendPart(StringBuilder sb, String part, boolean connect) {
+    if (connect) {
+      sb.append("AND ").append(part);
+    } else {
+      sb.append(part);
+    }
   }
 
   /**
@@ -71,11 +73,7 @@ public final class SearchCommand implements Command {
     if (decade != null && decade.length() > 0) {
       try {
         String decPart = "premiered BETWEEN ? AND ? ";
-        if (connect) {
-          sb.append("AND ").append(decPart);
-        } else {
-          sb.append(decPart);
-        }
+        appendPart(sb, decPart, connect);
         connect = true;
       } catch (Exception e) {
         e.printStackTrace();
@@ -84,29 +82,19 @@ public final class SearchCommand implements Command {
 
     if (region != null && region.length() > 0) {
       String regionPart = "region LIKE ? ";
-      if (connect) {
-        sb.append("AND ").append(regionPart);
-      } else {
-        sb.append(regionPart);
-      }
+      appendPart(sb, regionPart, connect);
+      connect = true;
     }
 
     if (genres != null && genres.length() > 0) {
       String genrePart = "genres LIKE ? ";
-      if (connect) {
-        sb.append("AND ").append(genrePart);
-      } else {
-        sb.append(genrePart);
-      }
+      appendPart(sb, genrePart, connect);
+      connect = true;
     }
-
     if (service != null && service.length() > 0) {
       String servicePart = "streaming_services LIKE ?";
-      if (connect) {
-        sb.append("AND ").append(servicePart);
-      } else {
-        sb.append(servicePart);
-      }
+      appendPart(sb, servicePart, connect);
+      connect = true;
     }
     if (connect) {
       sbFull.append(" WHERE ").append(sb);
@@ -199,7 +187,7 @@ public final class SearchCommand implements Command {
           PreparedStatement prep = conn.prepareStatement(queryString);
           prep.setString(1, m.getNodeId());
           ResultSet rs = prep.executeQuery();
-          Map<String, String> crew = new HashMap<String, String>();
+          Map<String, String> crew = new HashMap<>();
 
           while (rs.next()) {
             crew.put(rs.getString(3), rs.getString(4));
