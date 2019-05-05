@@ -156,7 +156,7 @@ public class Movie implements Node<Movie, MEdge>, Comparable<Movie> {
   }
 
   // TODO: raw ranking for searches that are NOT by similarity
-  /*
+  /**
    * Design Notes: - Computed once and (should be) stored to improve speed. -
    */
   public double rawRank() {

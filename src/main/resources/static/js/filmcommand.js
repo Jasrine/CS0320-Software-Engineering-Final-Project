@@ -39,7 +39,7 @@ class Film {
 			regionStr = region;
 		}
 
-		return "Film title: " + this.title + "\n Director: " + this.director + "\n Genres: " + this.genres 
+		return " Film title: " + this.title + "\n Director: " + this.director + "\n Genres: " + this.genres 
 		+ "\n Year in which this premiered: " + this.year + "\n Regions: " + regionStr;//this.regions.join(", ");
 	}
 }
@@ -63,8 +63,33 @@ function getSelectedOption(sel) {
  * load an image using the url.
  */
 function preloadImage(url) {
-    let img=new Image();
-    img.src=url;
+    let img = new Image();
+
+    // let imgOriginal = new Image();
+    // imgOriginal.src = url;
+    // console.log(imgOriginal)
+    // console.log(imgOriginal.height);
+    // console.log(imgOriginal.width);
+
+    // let max = Math.max(imgOriginal.width, imgOriginal.height);
+    // let min = Math.min(imgOriginal.width, imgOriginal.height);
+
+    // let newHeight = (imgOriginal.height/float(max)) * 100;
+    // let newWidth = (imgOriginal.width/float(max)) * 100;
+
+    // let widthBorderLeft = 50 - newWidth/2;
+    // let widthBorderRight = 50 + newWidth/2;
+    // let heightBorderTop = 50 - newHeight/2;
+    // let heightBorderBottom = 50 + newHeight/2;
+
+	img.src = url;
+    if (img.width > img.height) {
+    	img.style.width = '120px';
+    	img.style.height = 'auto';
+    } else {
+    	img.style.height = '120px';
+    	img.style.width = 'auto';
+    }
     return img;
 }
 
@@ -100,9 +125,55 @@ const decades = document.getElementById("decades");
 const genres = document.getElementById("genres");
 const services = document.getElementById("services");
 
+document.getElementById("searchResults").addEventListener("click", function(e) {
+	console.log(e);
+  if (e.target && e.target.matches("p.film-widget")) {
+
+  // 	const params = {
+
+  // 	};
+  // 	$.post("/similarity", params, responseJSON => {
+  // 		const responseObject = JSON.parse(responseJSON);
+  // 		responseObject.results.forEach(suggestion => {
+		// 	let f = new Film(suggestion.id, suggestion.filmName, suggestion.director, suggestion.genres,
+		// 		suggestion.year, suggestion.regions, suggestion.img);
+
+
+		// 	console.log(suggestion);
+		// 	const $node = document.createElement('p');//$("<li class=\"ui-widget-content\">").text(f.toString());
+		// 	$node.setAttribute('class', 'nested-film-widget');
+		// 	$node.setAttribute('innerHTML', f.toString());
+		// 	$node.setAttribute('innerText', f.toString());
+		// 	$node.textContent = f.toString();
+		// 				//$node.style = "opacity: 0.5; padding-left: 5px; text-align: left;";
+		// 	$nestedResults.append($node);
+		// 	console.log($node);
+		// 	if (suggestion.img != null && suggestion.img != undefined && suggestion.img.length > 0) {
+		// 		let img = preloadImage(suggestion.img);
+		// 					// img.width = 300;
+		// 					// img.height = 300;
+		// 		if (img == null || img == undefined) {
+		// 			img = preloadImage('/css/images/Question-Mark.png');
+		// 		}
+		// 		$nestedResults.append(img);
+		// 	} else {
+		// 		let img = preloadImage('/css/images/Question-Mark.png');
+		// 		$searchResults.append(img);
+		// 	}
+		// });
+  // 	}
+  	const val = e.target.nodeValue;
+
+  	console.log("foo");
+    //e.target.style.color = "#9932CC";
+    $searchQuery.value = e.target.innerHTML;
+    $searchQuery.val(e.target.innerHTML);
+  }
+});
+
 document.getElementById("suggestions").addEventListener("click", function(e) {
 	console.log(e);
-  if (e.target && e.target.matches("li.ui-widget-content")) {
+  if (e.target && e.target.matches("p.suggestions-widget")) {
   	console.log("foo");
     //e.target.style.color = "#9932CC";
     $searchQuery.value = e.target.innerHTML;
@@ -123,9 +194,10 @@ $(document).ready(() => {
 		addOptions(responseObject.genres, genres, genre_i);
 		addOptions(responseObject.decades, decades, decade_i);
 		addOptions(responseObject.services, services, service_i);
-		switchLoading();
+		
 	});
 	console.log("done with init");
+	switchLoading();
 
 	($searchQuery).keyup(event => {
 		if (event.which != 32) {	
@@ -158,12 +230,24 @@ $(document).ready(() => {
 
 
 						console.log(suggestion);
-						const $node = $("<li class=\"ui-widget-content\">").text(f.toString());
+						const $node = document.createElement('p');//$("<li class=\"ui-widget-content\">").text(f.toString());
+						$node.setAttribute('class', 'film-widget');
+						$node.setAttribute('innerHTML', f.toString());
+						$node.setAttribute('innerText', f.toString());
+						$node.textContent = f.toString();
+						//$node.style = "opacity: 0.5; padding-left: 5px; text-align: left;";
 						$searchResults.append($node);
+						console.log($node);
 						if (suggestion.img != null && suggestion.img != undefined && suggestion.img.length > 0) {
 							let img = preloadImage(suggestion.img);
 							// img.width = 300;
 							// img.height = 300;
+							if (img == null || img == undefined) {
+								img = preloadImage('/css/images/Question-Mark.png');
+							}
+							$searchResults.append(img);
+						} else {
+							let img = preloadImage('/css/images/Question-Mark.png');
 							$searchResults.append(img);
 						}
 					});
@@ -179,7 +263,9 @@ $(document).ready(() => {
 						$suggestions[0].removeChild($suggestions[0].children[j]);
 					}
 					responseObject.suggestions.split("\n").forEach(suggestion => {
-						const $node = $("<li class=\"ui-widget-content\">").text(suggestion);
+						const $node = document.createElement('p');
+						$node.setAttribute('class', 'suggestions-widget'); //$("<li class=\"suggestions-widget\">").text(suggestion);
+						$node.textContent = suggestion;
 						$suggestions.append($node);
 						i = i + 1;
 					});

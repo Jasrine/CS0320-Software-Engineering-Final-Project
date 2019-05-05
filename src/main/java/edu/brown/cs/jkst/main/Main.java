@@ -57,12 +57,6 @@ public final class Main {
     }
 
     try {
-
-      // String imageUrl =
-      // "https://www.imdb.com/title/tt0000008/mediaviewer/rm1288008704";
-      // String destinationFile = "secondimagefromimdb.jpg";
-      // Image.saveImage(imageUrl, destinationFile);
-
       Repl r = new Repl();
       MovieDatabase md = new MovieDatabase();
       md.registerAllCommands(r.CM);
@@ -100,6 +94,7 @@ public final class Main {
     Spark.post("/init", new InitHandlers.FrontInitHandler());
     Spark.post("/suggest", new Handler.SearchSuggestHandler());
     Spark.post("/search", new Handler.SearchSubmitHandler());
+    Spark.post("/similarity", new Handler.SimilarityHandler());
   }
 
   /**
