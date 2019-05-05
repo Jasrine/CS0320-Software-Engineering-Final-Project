@@ -25,7 +25,10 @@ public final class SearchCommand implements Command {
   private static final int EIGHT = 8;
   private static final int NINE = 9;
   private static final int DEC = 10;
+  private static final int ELEVEN = 11;
+  private static final int TWELVE = 12;
   private static final int NUM_RESULTS = 100;
+  private static final double MILI = 0.001;
   private static Map<String, String> serviceMap = FilmQuery.getServiceMap();
 
   @Override

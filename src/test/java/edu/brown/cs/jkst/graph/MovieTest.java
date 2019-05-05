@@ -82,6 +82,7 @@ public class MovieTest {
         regions, CARMENCITA_RATING, CARMENCITA_VOTES);
     m.setCrew(crew);
     m.setImgURL("www.iamtired.com");
+    System.out.println(m.rawRank());
     assertTrue(m.rawRank() == RAWRANK1);
     m.setVotes(0);
     assertTrue(m.rawRank() == 0);
