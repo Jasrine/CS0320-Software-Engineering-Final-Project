@@ -162,15 +162,16 @@ public final class SearchCommand implements Command {
         }
         if (region != null && region.length() > 0) {
           counter++;
-          prep.setString(counter, region);
+          prep.setString(counter, "%" + region.trim() + "%");
         }
         if (genres != null && genres.length() > 0) {
           counter++;
-          prep.setString(counter, "%" + genres + "%");
+          prep.setString(counter, "%" + genres.trim() + "%");
         }
         if (service != null && service.length() > 0) {
           counter++;
-          prep.setString(counter, "%" + this.serviceMap.get(service) + "%");
+          prep.setString(counter, "%" + serviceMap.get(service.trim()).trim()
+              + "%");
         }
 
         output = FilmQuery.topMovies(prep, null, NUM_RESULTS);

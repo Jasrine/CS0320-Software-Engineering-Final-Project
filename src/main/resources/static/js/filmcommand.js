@@ -143,9 +143,6 @@ document.getElementById("searchResults").addEventListener("click", function(e) {
 	console.log(e);
   if (e.target && e.target.matches("p.film-widget")) {
 
-  // 	const params = {
-
-  // 	};
    	$.post("/similarity", params, responseJSON => {
    		const responseObject = JSON.parse(responseJSON);
    		responseObject.results.forEach(suggestion => {
@@ -256,11 +253,9 @@ $(document).ready(() => {
 					});
 				});
 			} else {
-				console.log("SUGGEST");
 				console.log(params);
 				$.post("/suggest", params, responseJSON => {
 					const responseObject = JSON.parse(responseJSON);
-					console.log(responseObject);
 					let i = 0;
 					for (let j = $suggestions[0].children.length-1; j >= 0; j--) {
 						$suggestions[0].removeChild($suggestions[0].children[j]);

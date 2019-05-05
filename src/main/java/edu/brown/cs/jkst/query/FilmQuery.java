@@ -29,6 +29,7 @@ public final class FilmQuery {
   private static Trie<Character> trie = new Trie<Character>();
   private static List<String> regions = new LinkedList<String>();
   private static int numResults = 5;
+  private static int FINALRESULTS = 100;
   private static Connection conn = null;
   private static String[] genres = {
       "Short", "Comedy", "Documentary", "Sport", "Romance", "Family", "Drama",
@@ -251,16 +252,27 @@ public final class FilmQuery {
     }
   }
 
+  /**
+   * gets the top movies.
+   *
+   * @param prep
+   *          prepared statement
+   * @param comp
+   *          comparator
+   * @param max_num_results
+   *          maximum results allowed
+   * @return list of movies
+   * @throws SQLException
+   *           exception.
+   */
   public static List<Movie> topMovies(PreparedStatement prep,
-      Comparator<Movie> comp,
-      int max_num_results) throws SQLException {
+      Comparator<Movie> comp, int max_num_results) throws SQLException {
     List<Movie> output = new LinkedList<>();
     ResultSet rs = prep.executeQuery();
-    PriorityQueue<Movie> bestMovies = new PriorityQueue<>(100, comp);
+    PriorityQueue<Movie> bestMovies = new PriorityQueue<>(FINALRESULTS, comp);
     int numResults = 0;
     while (rs.next()) {
       String id = rs.getString(1);
-      // TODO: this is where we'd get the movie from the cache, if we had one
       String regionsRaw = rs.getString(2);
       if (rs.wasNull()) {
         regionsRaw = "";
