@@ -124,10 +124,7 @@ public final class SearchCommand implements Command {
       String genres, String service) {
     String queryString = getQuery(title, decade, region, genres, service);
     Connection conn = FilmQuery.getConn();
-
     List<Movie> output = new LinkedList<>();
-    // Set<Movie> poss = new HashSet<Movie>();
-
     if (conn != null) {
       try {
         PreparedStatement prep = conn.prepareStatement(queryString);
@@ -189,11 +186,12 @@ public final class SearchCommand implements Command {
             numVotes = 0;
           }
           String url = rs.getString(9);
-          Movie m = new Movie(id, filmName, director, url, year, genreLst, regions, rating, numVotes);
+          Movie m = new Movie(id, filmName, director, url, year, genreLst,
+              regions, rating, numVotes);
 
           // poss.add(m);
           output.add(m);
-//          System.out.println(m.toString());
+          // System.out.println(m.toString());
           numResults++;
         }
         rs.close();
