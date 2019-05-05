@@ -1,7 +1,7 @@
 INPUT
-input this
+suggest
 OUTPUT
 done loading in trie
 done loading in regions
-ERROR: Invalid Command
+ERROR: no arguments passed into suggest
 END

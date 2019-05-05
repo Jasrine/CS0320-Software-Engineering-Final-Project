@@ -1,7 +1,11 @@
 INPUT
-input this
+suggest Batman
 OUTPUT
 done loading in trie
 done loading in regions
-ERROR: Invalid Command
+Batman
+Zaman
+Yaman
+Taxman
+Scatman
 END
