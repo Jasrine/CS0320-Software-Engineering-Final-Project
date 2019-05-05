@@ -114,6 +114,7 @@ public final class Handler {
           0, 0);
 
       List<Movie> results = SelectCommand.INSTANCE.getSimilarMovies(m);
+      System.out.println("results: " + results.size());
       List<String> regions = FilmQuery.getRegions();
       List<String> genres = FilmQuery.getGenres();
       List<String> decades = FilmQuery.getDecades();

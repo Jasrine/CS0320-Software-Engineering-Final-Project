@@ -5,13 +5,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.PriorityQueue;
+import java.util.*;
 
 import edu.brown.cs.jkst.graphdata.Movie;
 import edu.brown.cs.jkst.main.CommandManager.Command;
@@ -134,7 +128,6 @@ public final class SearchCommand implements Command {
    */
   public List<Movie> search(String title, String decade, String region,
       String genres, String service) {
-    long t0 = System.currentTimeMillis();
     String queryString = getQuery(title, decade, region, genres, service);
     Connection conn = FilmQuery.getConn();
     List<Movie> output = new LinkedList<>();
@@ -162,94 +155,25 @@ public final class SearchCommand implements Command {
             e.printStackTrace();
           }
         }
-
         if (region != null && region.length() > 0) {
           counter++;
           prep.setString(counter, region);
         }
-
         if (genres != null && genres.length() > 0) {
           counter++;
           prep.setString(counter, "%" + genres + "%");
         }
-
         if (service != null && service.length() > 0) {
           counter++;
           prep.setString(counter, "%" + this.serviceMap.get(service) + "%");
         }
 
-        ResultSet rs = prep.executeQuery();
-
-        PriorityQueue<Movie> bestMovies = new PriorityQueue<>(100);
-
-        int numResults = 0;
-        while (rs.next()/* && numResults < NUM_RESULTS*/) {
-          String id = rs.getString(1);
-          //TODO: this is where we'd get the movie from the cache, if we had one
-          String regionsRaw = rs.getString(2);
-          if (rs.wasNull()) {
-            regionsRaw = "";
-          }
-          List<String> regions = Arrays.asList(regionsRaw.split(","));
-          String filmName = rs.getString(3);
-          if (rs.wasNull()) {
-            filmName = "";
-          }
-          int year = rs.getInt(4);
-          if (rs.wasNull()) {
-            year = 0;
-          }
-          List<String> genreLst = Arrays.asList(rs.getString(6).split(","));
-          if (rs.wasNull()) {
-            genreLst = Collections.emptyList();
-          }
-          double rating;
-          String rate = rs.getString(SEVEN);
-          if (rs.wasNull()) {
-            rating = 0.0;
-          } else {
-            try {
-              rating = Double.parseDouble(rate);
-            } catch (NumberFormatException e) {
-              rating = 0.0;
-            }
-          }
-          int numVotes = rs.getInt(EIGHT);
-          if (rs.wasNull()) {
-            numVotes = 0;
-          }
-          String url = rs.getString(NINE);
-          if (rs.wasNull()) {
-            url = "/css/images/Question-Mark.png";
-          }
-          Movie m = new Movie(id, filmName, url, year, genreLst,
-              regions, rating, numVotes);
-
-          if (numResults < 100) {
-            bestMovies.add(m);
-            numResults++;
-          } else if (m.compareTo(bestMovies.peek()) > 0){
-            bestMovies.poll();
-            bestMovies.add(m);
-            assert (bestMovies.size() == 100);
-          }
-
-//          output.add(m);
-//          numResults++;
-        }
-        rs.close();
-        prep.close();
-        assert bestMovies.size() <= 100;
-        output.addAll(bestMovies);
+        output = FilmQuery.topMovies(prep, null, NUM_RESULTS);
 //        getCrew(output);
       } catch (SQLException e) {
         e.printStackTrace();
       }
     }
-//    Collections.sort(output);
-    Collections.reverse(output);
-    long t1 = System.currentTimeMillis();
-    System.out.println("TIME: " + ((t1 - t0) * 0.001));
     return output;
   }
 

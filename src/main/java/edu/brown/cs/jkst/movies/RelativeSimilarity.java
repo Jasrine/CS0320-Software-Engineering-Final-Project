@@ -53,22 +53,22 @@ public class RelativeSimilarity implements Comparator<Movie> {
    */
   @Override
   public int compare(Movie o1, Movie o2) {
-    String filmName;
-//    String director;
-//    int year;
-    List<String> genres;
-    List<String> crew;
-    List<String> regions;
-//    double rating;
-    int numVotes;
+//    String filmName;
+////    String director;
+////    int year;
+//    List<String> genres;
+//    List<String> crew;
+//    List<String> regions;
+////    double rating;
+//    int numVotes;
+//
+//
+//    int yearScore1 = Math.abs(o1.getYear() - movie.getYear());
+//    int yearScore2 = Math.abs(o2.getYear() - movie.getYear());
 
+//    return 0;
 
-    int yearScore1 = Math.abs(o1.getYear() - movie.getYear());
-    int yearScore2 = Math.abs(o2.getYear() - movie.getYear());
-
-
-
-    return 0;
+    return Double.compare(movie.compareTo(o1), movie.compareTo(o2));
   }
 
   public int compareDirectors(Movie o1, Movie o2) {
