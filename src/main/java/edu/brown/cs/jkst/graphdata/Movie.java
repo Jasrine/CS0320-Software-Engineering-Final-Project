@@ -8,7 +8,7 @@ import java.util.TreeSet;
 /**
  * class describing a film node, implements our node interface.
  */
-public class Movie implements Node<Movie, MEdge>, Comparable<Movie> {
+public class Movie implements Comparable<Movie> {
 
   private String id;
   private String filmName;
@@ -18,7 +18,6 @@ public class Movie implements Node<Movie, MEdge>, Comparable<Movie> {
   private List<String> genres;
   private List<String> crew;
   private List<String> regions;
-  private Set<MEdge> edges;
   private double rating;
   private int numVotes;
   private double rawRanking;
@@ -60,7 +59,11 @@ public class Movie implements Node<Movie, MEdge>, Comparable<Movie> {
     this.rawRanking = this.rawRank();
   }
 
-  @Override
+  /**
+   * gets the node id.
+   * 
+   * @return the node id.
+   */
   public String getNodeId() {
     return this.id;
   }
@@ -85,22 +88,6 @@ public class Movie implements Node<Movie, MEdge>, Comparable<Movie> {
     this.numVotes = numvotes;
   }
 
-  @Override
-  public MEdge getEdge(Node<Movie, MEdge> n) {
-    for (MEdge e : this.edges) {
-      if (e.getDest().equals(n)) {
-        return e;
-      }
-    }
-
-    return null;
-  }
-
-  @Override
-  public Set<MEdge> getEdges() {
-    return this.edges;
-  }
-
   /**
    * getter for director.
    *
@@ -117,6 +104,16 @@ public class Movie implements Node<Movie, MEdge>, Comparable<Movie> {
    */
   public List<String> getGenres() {
     return this.genres;
+  }
+
+  /**
+   * setter for crew.
+   * 
+   * @param crew
+   *          list of strings representing the crew.
+   */
+  public void setCrew(List<String> crew) {
+    this.crew = crew;
   }
 
   /**

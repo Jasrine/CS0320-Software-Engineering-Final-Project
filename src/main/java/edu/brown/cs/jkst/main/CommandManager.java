@@ -97,6 +97,6 @@ public class CommandManager {
      *          Boolean which indicates whether execution is printing in the
      *          commandline, or sending output to a handler.
      */
-    void execute(String line, PrintWriter pw, Boolean repl);
+    String execute(String line, PrintWriter pw, Boolean repl);
   }
 }

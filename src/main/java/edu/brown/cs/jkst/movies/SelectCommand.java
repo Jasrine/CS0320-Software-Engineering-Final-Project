@@ -11,11 +11,12 @@ public final class SelectCommand implements Command {
   public static final SelectCommand INSTANCE = new SelectCommand();
 
   @Override
-  public void execute(String line, PrintWriter pw, Boolean repl) {
+  public String execute(String line, PrintWriter pw, Boolean repl) {
     // should pull up the appropriate profile, hopefully given an id.
     if (repl) {
       pw.print("select received this! " + line);
     }
+    return "";
   }
 
 }

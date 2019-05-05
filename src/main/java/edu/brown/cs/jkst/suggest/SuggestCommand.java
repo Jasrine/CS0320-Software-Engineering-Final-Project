@@ -1,7 +1,6 @@
 package edu.brown.cs.jkst.suggest;
 
 import java.io.PrintWriter;
-import java.util.Set;
 
 import edu.brown.cs.jkst.main.CommandManager.Command;
 import edu.brown.cs.jkst.query.FilmQuery;
@@ -13,13 +12,14 @@ public final class SuggestCommand implements Command {
   public static final SuggestCommand INSTANCE = new SuggestCommand();
 
   @Override
-  public void execute(String line, PrintWriter pw, Boolean repl) {
+  public String execute(String line, PrintWriter pw, Boolean repl) {
     String suggestions = FilmQuery.INSTANCE.findSuggestion(line);
     if (repl) {
       pw.println(suggestions);
     } else {
       pw.println("sent suggest stuff to handler");
     }
+    return suggestions;
   }
 
   /**
@@ -31,23 +31,5 @@ public final class SuggestCommand implements Command {
    */
   public String getTextSuggestions(String search) {
     return FilmQuery.INSTANCE.findSuggestion(search);
-  }
-
-  /**
-   * turns suggestions into String for display.
-   *
-   * @param suggestions
-   *          Set of strings that have to be displayed as suggestions.
-   * @return string for display in commandline. need to modify this for display
-   *         in handler.
-   */
-  public String displaySuggestions(Set<String> suggestions) {
-    StringBuilder sb = new StringBuilder();
-
-    if (sb.length() > 0) {
-      return sb.substring(0, sb.length() - 1);
-    }
-
-    return "";
   }
 }

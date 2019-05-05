@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -60,6 +61,21 @@ public final class FilmQuery {
   }
 
   /**
+   * Closes the connection.
+   */
+  public void closeConnection() {
+    try {
+      conn.close();
+    } catch (SQLException e) {
+      System.out.println("SQL connection problem in closing!");
+    }
+    regions = new ArrayList<String>();
+    decadeList = new ArrayList<String>();
+    serviceList = new ArrayList<String>();
+    genreList = new ArrayList<String>();
+  }
+
+  /**
    * getter for the alphabetically sorted list of regions available to the user.
    *
    * @return List of String with regions.
@@ -106,7 +122,7 @@ public final class FilmQuery {
   public int createConnection() {
     try {
       Class.forName("org.sqlite.JDBC");
-      conn = DriverManager.getConnection("jdbc:sqlite:data/imdb10.db");
+      conn = DriverManager.getConnection("jdbc:sqlite:data/imdb.db");
       Statement stat = conn.createStatement();
       stat.executeUpdate("PRAGMA foreign_keys = ON;");
 
@@ -144,7 +160,6 @@ public final class FilmQuery {
    */
   public String findSuggestion(String search) {
     Set<String> results = new HashSet<>();
-    System.out.println(search);
     results = trie.findLedWords(results, search, 2);
     results = trie.findPrefixedWords(search, results);
 
@@ -208,7 +223,7 @@ public final class FilmQuery {
       regions.addAll(regionSet);
       Collections.sort(regions);
     } catch (SQLException e) {
-      System.out.println("ERROR: SQL Exception caught in allAllRegions");
+      e.printStackTrace();
     }
   }
 }
