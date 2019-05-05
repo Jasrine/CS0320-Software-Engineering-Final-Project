@@ -140,7 +140,6 @@ public final class SearchCommand implements Command {
     if (conn != null) {
       try {
         PreparedStatement prep = conn.prepareStatement(queryString);
-        // setting variables
         int counter = 0;
 
         if (title != null && title.length() > 0) {
@@ -175,12 +174,10 @@ public final class SearchCommand implements Command {
         }
 
         output = FilmQuery.topMovies(prep, null, NUM_RESULTS);
-        // getCrew(output);
       } catch (SQLException e) {
-        e.printStackTrace();
+        System.out.println("SQL error!");
       }
     }
-    // Collections.sort(output);
     Collections.reverse(output);
     return output;
   }
@@ -213,7 +210,7 @@ public final class SearchCommand implements Command {
         }
 
       } catch (SQLException e) {
-        e.printStackTrace();
+        System.out.println("SQL error");
       }
     }
     return moviesWithoutCrew;

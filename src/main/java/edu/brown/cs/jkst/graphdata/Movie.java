@@ -306,7 +306,6 @@ public class Movie implements Comparable<Movie> {
     if (this.director.equals(m.director)) {
       directorScore = 1.0;
     }
-
     // consider averaging the genre similarity in both directions
     // consider accounting for the varying tones in the actual genres
     double genreScore = 0.0;
@@ -358,17 +357,16 @@ public class Movie implements Comparable<Movie> {
     // the "similarity" is inflated, making the "better" movie a more appealing
     // suggestion.
     double ratingScore = 1.0 - (Math.abs(this.rating - m.rating) * 0.1);
-    // TODO: normalize ratings by genre?
-
-    // TODO: crewScore (similar to genre score but with no weight on order?)
-    // TODO: regionScore (positive or negative depending on preference?)
-    // TODO: titleScore (? [still not sure that this is an important metric])
-    // TODO: awardScore (?? [dependent on ability to get more data])
-
-    // TODO: all parts of the score should be toggleable based on search
-    // settings
-
     return directorScore + genreScore + ratingScore;
+  }
+
+  /**
+   * Getter for the movie's release year.
+   * 
+   * @return the year for the movie's release.
+   */
+  public int getYear() {
+    return this.year;
   }
 
   @Override

@@ -6,7 +6,16 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Set;
 
 import edu.brown.cs.jkst.graphdata.Movie;
 import edu.brown.cs.jkst.trie.AutocorrectComparator;
@@ -243,17 +252,15 @@ public final class FilmQuery {
   }
 
   public static List<Movie> topMovies(PreparedStatement prep,
-                                      Comparator<Movie> comp,
-                                      int max_num_results) throws SQLException {
+      Comparator<Movie> comp,
+      int max_num_results) throws SQLException {
     List<Movie> output = new LinkedList<>();
-
-    long t0 = System.currentTimeMillis();
     ResultSet rs = prep.executeQuery();
     PriorityQueue<Movie> bestMovies = new PriorityQueue<>(100, comp);
     int numResults = 0;
     while (rs.next()) {
       String id = rs.getString(1);
-      //TODO: this is where we'd get the movie from the cache, if we had one
+      // TODO: this is where we'd get the movie from the cache, if we had one
       String regionsRaw = rs.getString(2);
       if (rs.wasNull()) {
         regionsRaw = "";
@@ -287,7 +294,7 @@ public final class FilmQuery {
         numVotes = 0;
       }
       Movie m = new Movie(id, filmName, year, genreLst,
-              regions, rating, numVotes);
+          regions, rating, numVotes);
       String url = rs.getString(9);
       if (!rs.wasNull()) {
         m.setImgURL(url);
@@ -295,7 +302,7 @@ public final class FilmQuery {
       if (numResults < max_num_results) {
         bestMovies.add(m);
         numResults++;
-      } else if (m.compareTo(bestMovies.peek()) > 0){
+      } else if (m.compareTo(bestMovies.peek()) > 0) {
         bestMovies.poll();
         bestMovies.add(m);
       }
@@ -305,8 +312,6 @@ public final class FilmQuery {
     assert bestMovies.size() <= max_num_results;
     output.addAll(bestMovies);
     Collections.reverse(output);
-    long t1 = System.currentTimeMillis();
-    System.out.println("TIME: " + ((t1 - t0) * 0.001));
     return output;
   }
 

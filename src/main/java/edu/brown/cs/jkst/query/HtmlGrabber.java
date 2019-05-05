@@ -109,8 +109,6 @@ public final class HtmlGrabber {
     String imgURL = grabHTML(url);
 
     if (imgURL.length() > 0) {
-      // write the image url and the titleId to a txt file.
-      // System.out.println(titleId);
       writer.println(titleId + "\t" + imgURL);
     }
 
