@@ -35,7 +35,6 @@ public final class FilmQuery {
       "1890s", "1900s", "1910s", "1920s", "1930s", "1940s", "1950s",
       "1960s", "1970s", "1980s", "1990s", "2000s", "2010s"
   };
-
   private static String[] services = {
       "Netflix", "Hulu", "Amazon Prime Video", "Showtime", "Sundance TV",
       "Epix", "Starz", "Hallmark", "Free Online Streaming Services", "HBO"
@@ -57,6 +56,18 @@ public final class FilmQuery {
    */
   public static Connection getConn() {
     return conn;
+  }
+
+  /**
+   * Closes the connection.
+   */
+  public void closeConnection() {
+    try {
+      conn.close();
+    } catch (SQLException e) {
+      System.out.println("ERROR: SQL connection problem in closing!");
+    }
+    regions = new LinkedList<String>();
   }
 
   /**
@@ -106,7 +117,7 @@ public final class FilmQuery {
   public int createConnection() {
     try {
       Class.forName("org.sqlite.JDBC");
-      conn = DriverManager.getConnection("jdbc:sqlite:data/imdb10.db");
+      conn = DriverManager.getConnection("jdbc:sqlite:data/imdb.db");
       Statement stat = conn.createStatement();
       stat.executeUpdate("PRAGMA foreign_keys = ON;");
 
@@ -144,7 +155,6 @@ public final class FilmQuery {
    */
   public String findSuggestion(String search) {
     Set<String> results = new HashSet<>();
-    System.out.println(search);
     results = trie.findLedWords(results, search, 2);
     results = trie.findPrefixedWords(search, results);
 
@@ -208,7 +218,7 @@ public final class FilmQuery {
       regions.addAll(regionSet);
       Collections.sort(regions);
     } catch (SQLException e) {
-      System.out.println("ERROR: SQL Exception caught in allAllRegions");
+      e.printStackTrace();
     }
   }
 }

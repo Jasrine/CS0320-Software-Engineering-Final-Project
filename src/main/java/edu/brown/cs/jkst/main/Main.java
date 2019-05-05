@@ -7,7 +7,6 @@ import java.io.StringWriter;
 
 import edu.brown.cs.jkst.handler.Handler;
 import edu.brown.cs.jkst.handler.InitHandlers;
-import edu.brown.cs.jkst.movies.MovieDatabase;
 import edu.brown.cs.jkst.repl.Repl;
 import freemarker.template.Configuration;
 import joptsimple.OptionParser;
@@ -57,16 +56,7 @@ public final class Main {
     }
 
     try {
-
-      // String imageUrl =
-      // "https://www.imdb.com/title/tt0000008/mediaviewer/rm1288008704";
-      // String destinationFile = "secondimagefromimdb.jpg";
-      // Image.saveImage(imageUrl, destinationFile);
-
       Repl r = new Repl();
-      MovieDatabase md = new MovieDatabase();
-      md.registerAllCommands(r.CM);
-
       r.read();
     } catch (Exception e) {
       e.printStackTrace();
@@ -100,6 +90,7 @@ public final class Main {
     Spark.post("/init", new InitHandlers.FrontInitHandler());
     Spark.post("/suggest", new Handler.SearchSuggestHandler());
     Spark.post("/search", new Handler.SearchSubmitHandler());
+    Spark.post("/similarity", new Handler.SimilarityHandler());
   }
 
   /**
