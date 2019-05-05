@@ -71,15 +71,6 @@ public class Movie implements Comparable<Movie> {
   }
 
   /**
-   * getter for the year in which this film premiered.
-   *
-   * @return year of film premiere.
-   */
-  public int getYear() {
-    return this.year;
-  }
-
-  /**
    * getter for the decade in which this film premiered.
    *
    * @return year of film premiere.
