@@ -28,6 +28,7 @@ public final class SearchCommand implements Command {
   private static final int ELEVEN = 11;
   private static final int TWELVE = 12;
   private static final int NUM_RESULTS = 100;
+  private static final double MILI = 0.001;
   private static Map<String, String> serviceMap = FilmQuery.getServiceMap();
 
   @Override
@@ -229,6 +230,7 @@ public final class SearchCommand implements Command {
           }
           Movie m = new Movie(id, filmName, year, genreLst,
               regions, rating, numVotes);
+
           m.setImgURL(url);
 
           String director = rs.wasNull() ? "" : rs.getString(ELEVEN);
@@ -263,7 +265,7 @@ public final class SearchCommand implements Command {
     // Collections.sort(output);
     Collections.reverse(output);
     long t1 = System.currentTimeMillis();
-    System.out.println("TIME: " + ((t1 - t0) * 0.001));
+    System.out.println("TIME: " + ((t1 - t0) * MILI));
     return output;
   }
 

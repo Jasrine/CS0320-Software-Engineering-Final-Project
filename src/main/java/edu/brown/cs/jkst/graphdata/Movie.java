@@ -217,9 +217,8 @@ public class Movie implements Comparable<Movie> {
     return this.numVotes;
   }
 
-  // TODO: raw ranking for searches that are NOT by similarity
   /**
-   * Design Notes: - Computed once and (should be) stored to improve speed. -
+   * raw ranking for searches that are NOT by similarity.
    *
    * @return double that indicates the raw rank.
    */
@@ -256,7 +255,7 @@ public class Movie implements Comparable<Movie> {
     // The oldest movie on IMDB is from 1874, so subtracting 1870 from the date
     // of release gives a normalized score that's higher the more current the
     // movie is.
-    // double awardsWon = 0.f; //TODO: if we have this data, number of awards
+    // double awardsWon = 0.f;
     // won
     double compWeight = 1.f;
     double yearWeight = 1.f;
@@ -284,7 +283,7 @@ public class Movie implements Comparable<Movie> {
   // //2. measure release date similarity
   // //3. measure region similarity
   // //4. measure genre similarity
-  // TODO: comparator extending class!!!
+  // todo comparator extending class!!!
   // }
 
   /**
@@ -317,8 +316,8 @@ public class Movie implements Comparable<Movie> {
       directorScore = 1.0;
     }
 
-    // TODO: consider averaging the genre similarity in both directions
-    // TODO: consider accounting for the varying tones in the actual genres
+    // consider averaging the genre similarity in both directions
+    // consider accounting for the varying tones in the actual genres
     double genreScore = 0.0;
     String AA = this.genres.get(0);
     String aa = m.genres.get(0);
