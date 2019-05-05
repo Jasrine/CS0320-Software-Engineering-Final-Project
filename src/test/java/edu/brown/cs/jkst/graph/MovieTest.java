@@ -26,8 +26,9 @@ public class MovieTest {
   private static final double CARMENCITA_RATING = 6.4;
   private static final int FAKEMOVIE_YEAR = 2013;
   private static final int FAKEMOVIE_VOTES = 34;
-  private static final double RAWRANK1 = 11.455999755859375;
-  private static final double RAWRANK2 = 1.7000000178813934;
+  private static final double RAWRANK1 = 123.50385801261433;
+  private static final double RAWRANK1_CHANGED = 24.0;
+  private static final double RAWRANK2 = 738.1585805231826;
 
   /**
    * method that tests getters and setters for Movie.
@@ -82,10 +83,9 @@ public class MovieTest {
         regions, CARMENCITA_RATING, CARMENCITA_VOTES);
     m.setCrew(crew);
     m.setImgURL("www.iamtired.com");
-    System.out.println(m.rawRank());
     assertTrue(m.rawRank() == RAWRANK1);
     m.setVotes(0);
-    assertTrue(m.rawRank() == 0);
+    assertTrue(m.rawRank() == RAWRANK1_CHANGED);
     List<String> genres2 = new ArrayList<String>();
     genres2.add("Documentary");
     genres2.add("Comedy");
@@ -101,7 +101,7 @@ public class MovieTest {
     m2.setCrew(crew2);
     m2.setImgURL("www.iamhappy.com");
     assertTrue(m2.rawRank() == RAWRANK2);
-    assertTrue(m.compareTo(m2) == 1);
+    assertTrue(m.compareTo(m2) == -1);
     List<String> genres3 = new ArrayList<String>();
     genres3.add("Documentary");
     genres3.add("Short");

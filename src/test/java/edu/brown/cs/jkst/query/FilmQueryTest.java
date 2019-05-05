@@ -3,8 +3,6 @@ package edu.brown.cs.jkst.query;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.sql.SQLException;
-
 import org.junit.Test;
 
 /**
@@ -21,11 +19,6 @@ public class FilmQueryTest {
    */
   @Test
   public void testConnection() {
-    try {
-      assertTrue(FilmQuery.INSTANCE.getConn().isClosed());
-    } catch (SQLException e) {
-      System.out.println("Error encountered in FilmQueryTest");
-    }
     FilmQuery.INSTANCE.createConnection();
     assertTrue(FilmQuery.INSTANCE.getConn() != null);
     assertTrue(FilmQuery.INSTANCE.getConn() != null);

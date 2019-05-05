@@ -113,7 +113,6 @@ public final class SearchCommand implements Command {
     if (connect) {
       sbFull.append(" WHERE ").append(sb);
     }
-    System.out.println(sbFull.toString());
     return sbFull.toString();
   }
 
@@ -137,7 +136,6 @@ public final class SearchCommand implements Command {
    */
   public List<Movie> search(String title, String decade, String region,
       String genres, String service) {
-    long t0 = System.currentTimeMillis();
     String queryString = getQuery(title, decade, region, genres, service);
     Connection conn = FilmQuery.getConn();
     List<Movie> output = new LinkedList<>();
@@ -264,8 +262,6 @@ public final class SearchCommand implements Command {
     }
     // Collections.sort(output);
     Collections.reverse(output);
-    long t1 = System.currentTimeMillis();
-    System.out.println("TIME: " + ((t1 - t0) * MILI));
     return output;
   }
 
