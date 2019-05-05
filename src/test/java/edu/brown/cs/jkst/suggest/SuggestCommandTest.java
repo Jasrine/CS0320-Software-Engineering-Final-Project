@@ -1,5 +1,6 @@
 package edu.brown.cs.jkst.suggest;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -10,8 +11,14 @@ import org.junit.Test;
 
 import edu.brown.cs.jkst.query.FilmQuery;
 
+/**
+ * class which contains methods for the SuggestCommand class.
+ */
 public class SuggestCommandTest {
 
+  /**
+   * tests the execute method implemented from the Command interface.
+   */
   @Test
   public void testExecute() {
     FilmQuery.INSTANCE.createConnection();
@@ -19,20 +26,11 @@ public class SuggestCommandTest {
     PrintWriter pw;
     try {
       pw = new PrintWriter(file);
-      assertTrue(SuggestCommand.INSTANCE.execute("Bat", pw, true).trim()
-          .equals(
-              "Bat\n" +
-                  "Zaw\n" +
-                  "Zap\n" +
-                  "Yap\n" +
-                  "Yao"));
-      assertTrue(SuggestCommand.INSTANCE.execute("Avenge", pw, true).trim()
-          .equals(
-              "Avenge\n" +
-                  "Revenge\n" +
-                  "Avenues\n" +
-                  "Avengers: Infinity War\n" +
-                  "Avengers: Age of Ultron"));
+      assertEquals(SuggestCommand.INSTANCE.execute("Bat", pw, true).trim(),
+          "Bat\nZaw\nZap\nYap\nYao");
+      assertEquals(SuggestCommand.INSTANCE.execute("Avenge", pw, true).trim(),
+          "Avenge\nRevenge\nAvenues\nAvengers: Infinity War\n"
+              + "Avengers: Age of Ultron");
 
       pw.close();
     } catch (FileNotFoundException e) {
@@ -43,23 +41,17 @@ public class SuggestCommandTest {
     FilmQuery.INSTANCE.closeConnection();
   }
 
+  /**
+   * method that tests getTextSuggestions from the search command class.
+   */
   @Test
   public void testGetTextSuggestions() {
     FilmQuery.INSTANCE.createConnection();
-    assertTrue(SuggestCommand.INSTANCE.getTextSuggestions("Bat").trim()
-        .equals(
-            "Bat\n" +
-                "Zaw\n" +
-                "Zap\n" +
-                "Yap\n" +
-                "Yao"));
-    assertTrue(SuggestCommand.INSTANCE.getTextSuggestions("Avenge").trim()
-        .equals(
-            "Avenge\n" +
-                "Revenge\n" +
-                "Avenues\n" +
-                "Avengers: Infinity War\n" +
-                "Avengers: Age of Ultron"));
+    assertEquals(SuggestCommand.INSTANCE.getTextSuggestions("Bat").trim(),
+        "Bat\nZaw\nZap\nYap\nYao");
+    assertEquals(SuggestCommand.INSTANCE.getTextSuggestions("Avenge").trim(),
+        "Avenge\nRevenge\nAvenues\nAvengers: Infinity War\n"
+            + "Avengers: Age of Ultron");
 
     assertTrue(SuggestCommand.INSTANCE.getTextSuggestions("xfgdxhchgv").trim()
         .equals(""));

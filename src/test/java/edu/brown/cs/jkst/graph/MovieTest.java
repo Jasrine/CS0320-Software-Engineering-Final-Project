@@ -1,9 +1,13 @@
 package edu.brown.cs.jkst.graph;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -11,8 +15,23 @@ import org.junit.Test;
 
 import edu.brown.cs.jkst.graphdata.Movie;
 
+/**
+ * class that contains tests for the movie class.
+ */
 public class MovieTest {
+  private static final int CARMENCITA_YEAR = 1894;
+  private static final int CARMENCITA_VOTES = 179;
+  private static final int CARMENCITA_FAKE_VOTES = 234;
+  private static final double CARMENCITA_FAKE_RATING = 8.0;
+  private static final double CARMENCITA_RATING = 6.4;
+  private static final int FAKEMOVIE_YEAR = 2013;
+  private static final int FAKEMOVIE_VOTES = 34;
+  private static final double RAWRANK1 = 11.455999755859375;
+  private static final double RAWRANK2 = 1.7000000178813934;
 
+  /**
+   * method that tests getters and setters for Movie.
+   */
   @Test
   public void testSettersAndGetters() {
     List<String> genres = new ArrayList<String>();
@@ -21,29 +40,32 @@ public class MovieTest {
     List<String> regions = new ArrayList<String>();
     regions.add("Hungary");
     regions.add("France");
-    List<String> crew = new ArrayList<String>();
-    crew.add("Tom");
-    crew.add("Harry");
-    Movie m = new Movie("tt0000001", "Carmencita", "William K.L. Dickson",
-        "www.iamtired.com", 1894, genres, regions, 6.4, 179);
+    Map<String, String> crew = new HashMap<String, String>();
+    crew.put("actor", "Tom");
+    crew.put("self", "Harry");
+    Movie m = new Movie("tt0000001", "Carmencita",
+        "www.iamtired.com", CARMENCITA_YEAR, genres, regions, CARMENCITA_RATING,
+        CARMENCITA_VOTES);
     m.setCrew(crew);
-    assertTrue(m.getNodeId().equals("tt0000001"));
-    assertTrue(m.getDirector().equals("William K.L. Dickson"));
+    assertEquals(m.getNodeId(), "tt0000001");
     assertTrue(m.getGenres().get(0).equals("Documentary"));
     assertTrue(m.getGenres().size() == 2);
-    assertTrue(m.getCrew().get(0).equals("Tom"));
+    assertTrue(m.getCrew().get("actor").equals("Tom"));
     assertTrue(m.getCrew().size() == 2);
     assertTrue(m.getRegions().get(1).equals("France"));
     assertTrue(m.getRegions().size() == 2);
-    assertTrue(m.getRating() == 6.4);
-    m.setRating(8);
-    assertTrue(m.getRating() == 8);
-    assertTrue(m.getNumVotes() == 179);
-    m.setVotes(234);
-    assertTrue(m.getNumVotes() == 234);
+    assertTrue(m.getRating() == CARMENCITA_RATING);
+    m.setRating(CARMENCITA_FAKE_RATING);
+    assertTrue(m.getRating() == CARMENCITA_FAKE_RATING);
+    assertTrue(m.getNumVotes() == CARMENCITA_VOTES);
+    m.setVotes(CARMENCITA_FAKE_VOTES);
+    assertEquals(m.getNumVotes(), CARMENCITA_FAKE_VOTES);
     assertTrue(m.getImageURL().equals("www.iamtired.com"));
   }
 
+  /**
+   * method that tests rank.
+   */
   @Test
   public void testRank() {
     List<String> genres = new ArrayList<String>();
@@ -53,13 +75,13 @@ public class MovieTest {
     List<String> regions = new ArrayList<String>();
     regions.add("Hungary");
     regions.add("France");
-    List<String> crew = new ArrayList<String>();
-    crew.add("Tom");
-    crew.add("Harry");
-    Movie m = new Movie("tt0000001", "Carmencita", "William K.L. Dickson",
-        "www.iamtired.com", 1894, genres, regions, 6.4, 179);
+    Map<String, String> crew = new HashMap<String, String>();
+    crew.put("actor", "Tom");
+    crew.put("self", "Harry");
+    Movie m = new Movie("tt0000001", "Carmencita", "www.iamtired.com",
+        CARMENCITA_YEAR, genres, regions, CARMENCITA_RATING, CARMENCITA_VOTES);
     m.setCrew(crew);
-    assertTrue(m.rawRank() == 11.455999755859375);
+    assertTrue(m.rawRank() == RAWRANK1);
     m.setVotes(0);
     assertTrue(m.rawRank() == 0);
     List<String> genres2 = new ArrayList<String>();
@@ -69,13 +91,13 @@ public class MovieTest {
     List<String> regions2 = new ArrayList<String>();
     regions.add("Hungary");
     regions.add("Germany");
-    List<String> crew2 = new ArrayList<String>();
-    crew2.add("Liz");
-    crew2.add("Harry");
-    Movie m2 = new Movie("tt0000002", "FakeMovie", "Mike",
-        "www.iamhappy.com", 2013, genres2, regions2, 5, 34);
+    Map<String, String> crew2 = new HashMap<String, String>();
+    crew2.put("actress", "Liz");
+    crew2.put("actor", "Harry");
+    Movie m2 = new Movie("tt0000002", "FakeMovie", "www.iamhappy.com",
+        FAKEMOVIE_YEAR, genres2, regions2, 5, FAKEMOVIE_VOTES);
     m2.setCrew(crew2);
-    assertTrue(m2.rawRank() == 1.7000000178813934);
+    assertTrue(m2.rawRank() == RAWRANK2);
     assertTrue(m.compareTo(m2) == 1);
     List<String> genres3 = new ArrayList<String>();
     genres3.add("Documentary");
@@ -84,11 +106,11 @@ public class MovieTest {
     List<String> regions3 = new ArrayList<String>();
     regions.add("Hungary");
     regions.add("France");
-    List<String> crew3 = new ArrayList<String>();
-    crew3.add("Liz");
-    crew3.add("Harry");
-    Movie m3 = new Movie("tt0000002", "FakeMovie2", "William K.L. Dickson",
-        "www.iamsad.com", 2013, genres3, regions3, 6.4, 34);
+    Map<String, String> crew3 = new HashMap<String, String>();
+    crew3.put("actress", "Liz");
+    crew3.put("actor", "Harry");
+    Movie m3 = new Movie("tt0000002", "FakeMovie2", "www.iamsad.com",
+        FAKEMOVIE_YEAR, genres3, regions3, CARMENCITA_RATING, FAKEMOVIE_VOTES);
     m2.setCrew(crew2);
     assertTrue(m.scoreSimilarity(m3) == 3);
     Set<Movie> movies = new TreeSet<Movie>();
@@ -103,6 +125,9 @@ public class MovieTest {
     assertTrue(listSugg.get(0).equals(m3));
   }
 
+  /**
+   * method that tests the equals method for the Movie class.
+   */
   @Test
   public void testEquals() {
     List<String> genres = new ArrayList<String>();
@@ -112,11 +137,12 @@ public class MovieTest {
     List<String> regions = new ArrayList<String>();
     regions.add("Hungary");
     regions.add("France");
-    List<String> crew = new ArrayList<String>();
-    crew.add("Tom");
-    crew.add("Harry");
-    Movie m = new Movie("tt0000001", "Carmencita", "William K.L. Dickson",
-        "www.iamtired.com", 1894, genres, regions, 6.4, 179);
+    Map<String, String> crew = new HashMap<String, String>();
+    crew.put("actor", "Tom");
+    crew.put("director", "Harry");
+    Movie m = new Movie("tt0000001", "Carmencita",
+        "www.iamtired.com", CARMENCITA_YEAR, genres, regions, CARMENCITA_RATING,
+        CARMENCITA_VOTES);
     m.setCrew(crew);
     List<String> genres2 = new ArrayList<String>();
     genres2.add("Documentary");
@@ -125,18 +151,23 @@ public class MovieTest {
     List<String> regions2 = new ArrayList<String>();
     regions.add("Hungary");
     regions.add("Germany");
-    List<String> crew2 = new ArrayList<String>();
-    crew2.add("Liz");
-    crew2.add("Harry");
-    Movie m2 = new Movie("tt0000002", "FakeMovie", "Mike",
-        "www.iamhappy.com", 2013, genres2, regions2, 5, 34);
+    Map<String, String> crew2 = new HashMap<String, String>();
+    crew2.put("actress", "Liz");
+    crew2.put("actor", "Harry");
+    Movie m2 = new Movie("tt0000002", "FakeMovie",
+        "www.iamhappy.com", FAKEMOVIE_YEAR, genres2, regions2, 5,
+        FAKEMOVIE_VOTES);
     m2.setCrew(crew2);
-    assertTrue(m.equals(m2) == false);
-    Movie m3 = new Movie("tt0000001", "Carmencita", "William K.L. Dickson",
-        "www.iamtired.com", 1894, genres, regions, 6.4, 179);
-    assertTrue(m.equals(m3) == true);
+    assertFalse(m.equals(m2));
+    Movie m3 = new Movie("tt0000001", "Carmencita",
+        "www.iamtired.com", CARMENCITA_YEAR, genres, regions, CARMENCITA_RATING,
+        CARMENCITA_VOTES);
+    assertTrue(m.equals(m3));
   }
 
+  /**
+   * tests the toString method for the Movie class.
+   */
   @Test
   public void testToString() {
     List<String> genres = new ArrayList<String>();
@@ -146,17 +177,17 @@ public class MovieTest {
     List<String> regions = new ArrayList<String>();
     regions.add("Hungary");
     regions.add("France");
-    List<String> crew = new ArrayList<String>();
-    crew.add("Tom");
-    crew.add("Harry");
-    Movie m = new Movie("tt0000001", "Carmencita", "William K.L. Dickson",
-        "www.iamtired.com", 1894, genres, regions, 6.4, 179);
+    Map<String, String> crew = new HashMap<String, String>();
+    crew.put("actor", "Tom");
+    crew.put("director", "Harry");
+    Movie m = new Movie("tt0000001", "Carmencita", "www.iamtired.com",
+        CARMENCITA_YEAR, genres, regions, CARMENCITA_RATING, CARMENCITA_VOTES);
     m.setCrew(crew);
-    assertTrue(m.toString().trim().equals("Film name: Carmencita\n" +
-        "Director: William K.L. Dickson\n" +
-        "Year: 1894\n" +
-        "Genres: [Documentary, Short, Romance]\n" +
-        "Regions: Hungary, France"));
+    assertEquals(m.toString().trim(), "Film name: Carmencita\n"
+        + "Director: Harry\n"
+        + "Year: 1894\n"
+        + "Genres: [Documentary, Short, Romance]\n"
+        + "Regions: Hungary, France");
   }
 
 }

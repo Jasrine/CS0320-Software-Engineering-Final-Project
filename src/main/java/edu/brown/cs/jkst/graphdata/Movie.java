@@ -2,6 +2,7 @@ package edu.brown.cs.jkst.graphdata;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -16,7 +17,7 @@ public class Movie implements Comparable<Movie> {
   private String img;
   private int year;
   private List<String> genres;
-  private List<String> crew;
+  private Map<String, String> crew;
   private List<String> regions;
   private double rating;
   private int numVotes;
@@ -29,8 +30,6 @@ public class Movie implements Comparable<Movie> {
    *          String id for uniquely identifying a movie.
    * @param filmName
    *          String name for displaying the film.
-   * @param director
-   *          String id for director.
    * @param imgURL
    *          String containing a url for displaying the image if it exists.
    * @param year
@@ -44,12 +43,11 @@ public class Movie implements Comparable<Movie> {
    * @param numVotes
    *          Number of people who contributed to the rating
    */
-  public Movie(String id, String filmName, String director, String imgURL,
-      int year, List<String> genres, List<String> regions,
-      double rating, int numVotes) {
+  public Movie(String id, String filmName, String imgURL, int year,
+      List<String> genres, List<String> regions, double rating, int numVotes) {
     this.id = id;
     this.filmName = filmName;
-    this.director = director;
+    this.director = "";
     this.img = imgURL;
     this.year = year;
     this.genres = genres;
@@ -61,7 +59,7 @@ public class Movie implements Comparable<Movie> {
 
   /**
    * gets the node id.
-   * 
+   *
    * @return the node id.
    */
   public String getNodeId() {
@@ -108,12 +106,16 @@ public class Movie implements Comparable<Movie> {
 
   /**
    * setter for crew.
-   * 
+   *
    * @param crew
    *          list of strings representing the crew.
    */
-  public void setCrew(List<String> crew) {
-    this.crew = crew;
+  public void setCrew(Map<String, String> crew) {
+    if (crew != null) {
+      this.director = crew.containsKey("director") ? crew.get(
+          "director") : "";
+      this.crew = crew;
+    }
   }
 
   /**
@@ -121,7 +123,7 @@ public class Movie implements Comparable<Movie> {
    *
    * @return list of strings indicating names of crew members.
    */
-  public List<String> getCrew() {
+  public Map<String, String> getCrew() {
     return this.crew;
   }
 

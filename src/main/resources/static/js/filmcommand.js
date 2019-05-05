@@ -39,8 +39,21 @@ class Film {
 			regionStr = region;
 		}
 
-		return " Film title: " + this.title + "\n Director: " + this.director + "\n Genres: " + this.genres 
-		+ "\n Year in which this premiered: " + this.year + "\n Regions: " + regionStr;//this.regions.join(", ");
+		let resultStr = " Film title: " + this.title;
+		if (this.director.trim().length > 0) {
+			resultStr += ("\n Director: " + this.director);
+		}
+		if (this.genres.length > 0) {
+			resultStr += ("\n Genres: " + this.genres);
+		}
+		if (parseInt(this.year) > 0) {
+			resultStr += ("\n Year in which this premiered: " + this.year);
+		}
+		if (this.regionStr != undefined && this.regionStr != null && this.regionStr.length > 0) {
+			resultStr += ("\n Regions: " + regionStr);
+		}
+
+		return resultStr;//this.regions.join(", ");
 	}
 }
 
@@ -162,7 +175,7 @@ document.getElementById("searchResults").addEventListener("click", function(e) {
 		// 	}
 		// });
   // 	}
-  	const val = e.target.nodeValue;
+  	const val = e.target.node;
 
   	console.log("foo");
     //e.target.style.color = "#9932CC";

@@ -110,8 +110,8 @@ public final class Handler {
       for (String genres : filmGenre.split(", ")) {
         filmGenres.add(genres);
       }
-      Movie m = new Movie(filmId, filmName, filmDirector, "", filmYear,
-          filmGenres, filmRegions, 0, 0);
+      Movie m = new Movie(filmId, filmName, "", filmYear, filmGenres,
+          filmRegions, 0, 0);
 
       List<Movie> results = SelectCommand.INSTANCE.getSimilarMovies(m);
       List<String> regions = FilmQuery.getRegions();

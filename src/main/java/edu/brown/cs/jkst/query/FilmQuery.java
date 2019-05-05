@@ -6,7 +6,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -36,7 +35,6 @@ public final class FilmQuery {
       "1890s", "1900s", "1910s", "1920s", "1930s", "1940s", "1950s",
       "1960s", "1970s", "1980s", "1990s", "2000s", "2010s"
   };
-
   private static String[] services = {
       "Netflix", "Hulu", "Amazon Prime Video", "Showtime", "Sundance TV",
       "Epix", "Starz", "Hallmark", "Free Online Streaming Services", "HBO"
@@ -67,12 +65,9 @@ public final class FilmQuery {
     try {
       conn.close();
     } catch (SQLException e) {
-      System.out.println("SQL connection problem in closing!");
+      System.out.println("ERROR: SQL connection problem in closing!");
     }
-    regions = new ArrayList<String>();
-    decadeList = new ArrayList<String>();
-    serviceList = new ArrayList<String>();
-    genreList = new ArrayList<String>();
+    regions = new LinkedList<String>();
   }
 
   /**
