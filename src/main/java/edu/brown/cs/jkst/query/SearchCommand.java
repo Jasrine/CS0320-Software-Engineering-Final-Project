@@ -25,6 +25,7 @@ public final class SearchCommand implements Command {
   private static final int NINE = 9;
   private static final int DEC = 10;
   private static final int NUM_RESULTS = 100;
+  private static Map<String, String> serviceMap = FilmQuery.getServiceMap();
 
   @Override
   public String execute(String line, PrintWriter pw, Boolean repl) {
@@ -165,6 +166,11 @@ public final class SearchCommand implements Command {
         if (genres != null && genres.length() > 0) {
           counter++;
           prep.setString(counter, "%" + genres + "%");
+        }
+
+        if (service != null && service.length() > 0) {
+          counter++;
+          prep.setString(counter, "%" + this.serviceMap.get(service) + "%");
         }
 
         ResultSet rs = prep.executeQuery();

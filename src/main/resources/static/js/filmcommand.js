@@ -7,7 +7,7 @@ class Film {
 	/*
 	 * contains relevant information for the class 
 	 */
-	constructor(id, title, director, genres, year, regions, img) {
+	constructor(id, title, director, genres, year, regions, img, cast) {
 		this.id = id;
 		this.title = title;
 		this.director = director;
@@ -15,6 +15,7 @@ class Film {
 		this.year = year;
 		this.regions = regions;
 		this.img = img;
+		this.cast = cast;
 	}
 
 	renderFilmNode() {
@@ -22,38 +23,37 @@ class Film {
 	}
 
 	toString() {
+
+
 		let region = this.regions.join(", ");
-		//console.log(region);
-		console.log(this.regions.join(", "));
 		let line = region;
 		let regionStr = "";
 		while (line.length > 80) {
 			let piece = line.substring(0, 80);
 			let lastSpace = piece.lastIndexOf(", ");
 			piece = piece.substring(0, lastSpace);
-			console.log(piece);
-			regionStr += (piece.concat("\n"));
+			regionStr = regionStr + piece.concat("\n");
 			line = line.substring(lastSpace + 1, line.length - 1);
 		}
+		
 		if (regionStr.length < 1) {
 			regionStr = region;
 		}
-
 		let resultStr = " Film title: " + this.title;
 		if (this.director.trim().length > 0) {
 			resultStr += ("\n Director: " + this.director);
 		}
 		if (this.genres.length > 0) {
-			resultStr += ("\n Genres: " + this.genres);
+			resultStr += ("\n Genres: " + this.genres.join(", "));
 		}
 		if (parseInt(this.year) > 0) {
 			resultStr += ("\n Year in which this premiered: " + this.year);
 		}
-		if (this.regionStr != undefined && this.regionStr != null && this.regionStr.length > 0) {
+		if (regionStr != undefined && regionStr != null && regionStr.length > 0) {
 			resultStr += ("\n Regions: " + regionStr);
 		}
 
-		return resultStr;//this.regions.join(", ");
+		return resultStr;
 	}
 }
 
@@ -77,24 +77,6 @@ function getSelectedOption(sel) {
  */
 function preloadImage(url) {
     let img = new Image();
-
-    // let imgOriginal = new Image();
-    // imgOriginal.src = url;
-    // console.log(imgOriginal)
-    // console.log(imgOriginal.height);
-    // console.log(imgOriginal.width);
-
-    // let max = Math.max(imgOriginal.width, imgOriginal.height);
-    // let min = Math.min(imgOriginal.width, imgOriginal.height);
-
-    // let newHeight = (imgOriginal.height/float(max)) * 100;
-    // let newWidth = (imgOriginal.width/float(max)) * 100;
-
-    // let widthBorderLeft = 50 - newWidth/2;
-    // let widthBorderRight = 50 + newWidth/2;
-    // let heightBorderTop = 50 - newHeight/2;
-    // let heightBorderBottom = 50 + newHeight/2;
-
 	img.src = url;
     if (img.width > img.height) {
     	img.style.width = '120px';
@@ -118,6 +100,7 @@ function switchLoading() {
  * helper for adding options with a given counter.
  */
 function addOptions(res, sel, counter) {
+	let counter_2 = counter;
 	res.forEach(opt => {
 		if (opt != null && opt != undefined) {
 			const option = document.createElement("option");
@@ -125,8 +108,19 @@ function addOptions(res, sel, counter) {
 			option.setAttribute('value', counter);
 			sel.add(option);
 			counter = counter + 1;
+			counter_2 = counter;
 		}
 	});
+
+	return counter_2;
+}
+
+function wait(ms){
+   var start = new Date().getTime();
+   var end = start;
+   while(end < start + ms) {
+     end = new Date().getTime();
+  }
 }
 
 // Global references
@@ -145,50 +139,45 @@ document.getElementById("searchResults").addEventListener("click", function(e) {
   // 	const params = {
 
   // 	};
-  // 	$.post("/similarity", params, responseJSON => {
-  // 		const responseObject = JSON.parse(responseJSON);
-  // 		responseObject.results.forEach(suggestion => {
-		// 	let f = new Film(suggestion.id, suggestion.filmName, suggestion.director, suggestion.genres,
-		// 		suggestion.year, suggestion.regions, suggestion.img);
+   	$.post("/similarity", params, responseJSON => {
+   		const responseObject = JSON.parse(responseJSON);
+   		responseObject.results.forEach(suggestion => {
+			let f = new Film(suggestion.id, suggestion.filmName, suggestion.director, suggestion.genres,
+		 		suggestion.year, suggestion.regions, suggestion.img, "");
 
 
-		// 	console.log(suggestion);
-		// 	const $node = document.createElement('p');//$("<li class=\"ui-widget-content\">").text(f.toString());
-		// 	$node.setAttribute('class', 'nested-film-widget');
-		// 	$node.setAttribute('innerHTML', f.toString());
-		// 	$node.setAttribute('innerText', f.toString());
-		// 	$node.textContent = f.toString();
+			console.log(suggestion);
+			const $node = document.createElement('p');//$("<li class=\"ui-widget-content\">").text(f.toString());
+			$node.setAttribute('class', 'nested-film-widget');
+			$node.setAttribute('innerHTML', f.toString());
+			$node.setAttribute('innerText', f.toString());
+			$node.textContent = f.toString();
 		// 				//$node.style = "opacity: 0.5; padding-left: 5px; text-align: left;";
-		// 	$nestedResults.append($node);
-		// 	console.log($node);
-		// 	if (suggestion.img != null && suggestion.img != undefined && suggestion.img.length > 0) {
-		// 		let img = preloadImage(suggestion.img);
-		// 					// img.width = 300;
-		// 					// img.height = 300;
-		// 		if (img == null || img == undefined) {
-		// 			img = preloadImage('/css/images/Question-Mark.png');
-		// 		}
-		// 		$nestedResults.append(img);
-		// 	} else {
-		// 		let img = preloadImage('/css/images/Question-Mark.png');
-		// 		$searchResults.append(img);
-		// 	}
-		// });
-  // 	}
+			$nestedResults.append($node);
+			console.log($node);
+			if (suggestion.img != null && suggestion.img != undefined && suggestion.img.length > 0) {
+				let img = preloadImage(suggestion.img);
+							// img.width = 300;
+							// img.height = 300;
+				if (img == null || img == undefined) {
+					img = preloadImage('/css/images/Question-Mark.png');
+				}
+				$nestedResults.append(img);
+			} else {
+				let img = preloadImage('/css/images/Question-Mark.png');
+				$searchResults.append(img);
+			}
+		});
+  	});
   	const val = e.target.node;
-
-  	console.log("foo");
-    //e.target.style.color = "#9932CC";
     $searchQuery.value = e.target.innerHTML;
     $searchQuery.val(e.target.innerHTML);
   }
 });
 
 document.getElementById("suggestions").addEventListener("click", function(e) {
-	console.log(e);
+	//console.log(e);
   if (e.target && e.target.matches("p.suggestions-widget")) {
-  	console.log("foo");
-    //e.target.style.color = "#9932CC";
     $searchQuery.value = e.target.innerHTML;
     $searchQuery.val(e.target.innerHTML);
   }
@@ -200,15 +189,16 @@ $(document).ready(() => {
 	let decade_i = 1;
 	let service_i = 1;
 
+	wait(8000);
 	// initialization
 	$.post("/init", {}, responseJSON => {
-		const responseObject = JSON.parse(responseJSON);
-		addOptions(responseObject.regions, regions, region_i);
-		addOptions(responseObject.genres, genres, genre_i);
-		addOptions(responseObject.decades, decades, decade_i);
-		addOptions(responseObject.services, services, service_i);
-		
-	});
+			const responseObject = JSON.parse(responseJSON);
+			region_i = addOptions(responseObject.regions, regions, region_i);
+			genre_i = addOptions(responseObject.genres, genres, genre_i);
+			decade_i = addOptions(responseObject.decades, decades, decade_i);
+			service_i = addOptions(responseObject.services, services, service_i);
+			
+		});
 	console.log("done with init");
 	switchLoading();
 
@@ -239,22 +229,15 @@ $(document).ready(() => {
 					}
 					responseObject.results.forEach(suggestion => {
 						let f = new Film(suggestion.id, suggestion.filmName, suggestion.director, suggestion.genres,
-							suggestion.year, suggestion.regions, suggestion.img);
-
-
-						console.log(suggestion);
-						const $node = document.createElement('p');//$("<li class=\"ui-widget-content\">").text(f.toString());
+							suggestion.year, suggestion.regions, suggestion.img, "");
+						const $node = document.createElement('p');
 						$node.setAttribute('class', 'film-widget');
 						$node.setAttribute('innerHTML', f.toString());
 						$node.setAttribute('innerText', f.toString());
 						$node.textContent = f.toString();
-						//$node.style = "opacity: 0.5; padding-left: 5px; text-align: left;";
 						$searchResults.append($node);
-						console.log($node);
 						if (suggestion.img != null && suggestion.img != undefined && suggestion.img.length > 0) {
 							let img = preloadImage(suggestion.img);
-							// img.width = 300;
-							// img.height = 300;
 							if (img == null || img == undefined) {
 								img = preloadImage('/css/images/Question-Mark.png');
 							}
@@ -277,7 +260,7 @@ $(document).ready(() => {
 					}
 					responseObject.suggestions.split("\n").forEach(suggestion => {
 						const $node = document.createElement('p');
-						$node.setAttribute('class', 'suggestions-widget'); //$("<li class=\"suggestions-widget\">").text(suggestion);
+						$node.setAttribute('class', 'suggestions-widget');
 						$node.textContent = suggestion;
 						$suggestions.append($node);
 						i = i + 1;
