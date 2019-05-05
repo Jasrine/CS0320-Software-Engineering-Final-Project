@@ -72,10 +72,10 @@ public final class Handler {
       String genre = qm.value("genre");
       String decade = qm.value("decade");
       String service = qm.value("service");
-      System.out.println(service + " " + decade + " " + genre + " " + search);
+//      System.out.println(service + " " + decade + " " + genre + " " + search);
       List<Movie> results = SearchCommand.INSTANCE.search(search, decade,
           region, genre, service);
-      System.out.println(results.toString());
+//      System.out.println(results.toString());
       Map<String, Object> variables = ImmutableMap.of("title",
           "Film suggestions", "results", results);
       return GSON.toJson(variables);
