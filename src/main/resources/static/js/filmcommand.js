@@ -36,23 +36,23 @@ class Film {
 			regionStr = region;
 		}
 
-		let textNode = document.createElement('b').appendChild(document.createTextNode("Film title: "));
-		textNode.appendChild(document.createTextNode(this.title));
+		//let textNode = document.createElement('b').appendChild(document.createTextNode("Film title: "));
+		//textNode.appendChild(document.createTextNode(this.title));
 		
 
 		let resultStr = " Film title: " + this.title;
 		if (this.director != undefined && this.director != null && this.director.trim().length > 0) {
-			textNode.appendChild(document.createElement('br'));
-			textNode.appendChild(document.createElement('b').appendChild(
-				document.createTextNode("Director: ")));
-			textNode.appendChild(document.createTextNode(this.director));
+			// textNode.appendChild(document.createElement('br'));
+			// textNode.appendChild(document.createElement('b').appendChild(
+			// 	document.createTextNode("Director: ")));
+			// textNode.appendChild(document.createTextNode(this.director));
 			resultStr += ("\n Director: " + this.director);
 		}
 		if (this.genres != undefined && this.genres != null && this.genres.length > 0 && this.genres[0].trim().length > 0) {
-			textNode.appendChild(document.createElement('br'));
-			textNode.appendChild(document.createElement('b').appendChild(
-				document.createTextNode("Genres: ")));
-			textNode.appendChild(document.createTextNode(this.genres.join(", ")));
+			// textNode.appendChild(document.createElement('br'));
+			// textNode.appendChild(document.createElement('b').appendChild(
+			// 	document.createTextNode("Genres: ")));
+			// textNode.appendChild(document.createTextNode(this.genres.join(", ")));
 			resultStr += ("\n Genres: " + this.genres.join(", "));
 		}
 		if (parseInt(this.year) > 0) {
@@ -145,13 +145,14 @@ function wait(ms){
 const $searchQuery = $("#search");
 const $suggestions = $("#suggestions");
 const $searchResults = $("#searchResults");
+const currFilm = document.getElementById("currFilm");
 const regions = document.getElementById("regions");
 const decades = document.getElementById("decades");
 const genres = document.getElementById("genres");
 const services = document.getElementById("services");
+const index = document.getElementById("index2");
 
 document.getElementById("searchResults").addEventListener("click", function(e) {
-	console.log(e);
     if (e.target && e.target.matches("td")) {
 	  	const f = e.target.potato;
 	  	const params = {
@@ -169,6 +170,13 @@ document.getElementById("searchResults").addEventListener("click", function(e) {
 		console.log(params);
    	$.post("/similarity", params, responseJSON => {
    		const responseObject = JSON.parse(responseJSON);
+   		index.style = "display:none;";
+   		for (let j = $searchResults[0].children.length-1; j >= 0; j--) {
+			$searchResults[0].removeChild($searchResults[0].children[j]);
+		}
+
+		currFilm.innerHTML = f.toString();
+
    		const $node = document.createElement('table');
 		$node.setAttribute('class', 'film-widget-table');
    		responseObject.results.forEach(suggestion => {
@@ -213,6 +221,9 @@ document.getElementById("suggestions").addEventListener("click", function(e) {
   if (e.target && e.target.matches("td.suggestions-widget-td")) {
     $searchQuery.value = e.target.innerHTML;
     $searchQuery.val(e.target.innerHTML);
+    for (let j = $suggestions[0].children.length-1; j >= 0; j--) {
+		$suggestions[0].removeChild($suggestions[0].children[j]);
+	}
   }
 });
 
@@ -222,8 +233,10 @@ $(document).ready(() => {
 	let decade_i = 1;
 	let service_i = 1;
 
-	wait(8000);
-	$.post("/init", {}, responseJSON => {
+	if (region_i < 2) {
+		wait(8000);
+	
+		$.post("/init", {}, responseJSON => {
 			const responseObject = JSON.parse(responseJSON);
 			region_i = addOptions(responseObject.regions, regions, region_i);
 			genre_i = addOptions(responseObject.genres, genres, genre_i);
@@ -231,6 +244,7 @@ $(document).ready(() => {
 			service_i = addOptions(responseObject.services, services, service_i);
 			
 		});
+	}
 	console.log("done with init");
 	switchLoading();
 
@@ -251,9 +265,12 @@ $(document).ready(() => {
 			// when enter is pressed
 			if (event.which == 13) {
 				// if a user presses enter, search through database with the options the user has selected.
+				for (let j = $suggestions[0].children.length-1; j >= 0; j--) {
+					$suggestions[0].removeChild($suggestions[0].children[j]);
+				}
+
 				$.post("/search", params, responseJSON => {
 					const responseObject = JSON.parse(responseJSON);
-					console.log("TEST!!!\n");
 					console.log(responseObject);
 
 					for (let j = $searchResults[0].children.length-1; j >= 0; j--) {

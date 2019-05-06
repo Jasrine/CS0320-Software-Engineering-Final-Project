@@ -54,17 +54,17 @@
         }
     </style>
 </head>
-<body>
-    
+<body> 
     <div class="outer" id="outer">
         <div class="index" id="index">
+        <div class="loading style-2" id="loading style-2"><div class="loading-wheel"></div></div>
+        <a class = 'filmdb' href="http://localhost:4567/filmdb"><img src="https://fontmeme.com/permalink/190506/675802bc1aed73ae426e940588e6d752.png" alt="glacial-indifference-font" border="0"></a>
+        <BR><BR>
 
-            <div class="loading style-2" id="loading style-2"><div class="loading-wheel"></div></div>
-            <a class = 'filmdb' href="https://fontmeme.com/fonts/glacial-indifference-font/"><img src="https://fontmeme.com/permalink/190506/675802bc1aed73ae426e940588e6d752.png" alt="glacial-indifference-font" border="0"></a>
-            <BR> <BR> <BR>
+        <div class="index" id="index2">
             Enter a possible film title:<br>
             <input type="text" id="search" name="search">
-            <label name="suggestions" id="suggestions"></label>
+            <label name="suggestions" id="suggestions"></label><BR>
 
             From a year: <select name="decades" id="decades">
                 <option value="0">Select a decade.</option>
@@ -84,7 +84,9 @@
                 <option value="0">Select a streaming service.</option>
             </select><br>
             Here are suggestions:<br>
+            </div>
 
+            <p name="currFilm" id="currFilm"></p>
             <p name="searchResults" id="searchResults"></p>
             <p style="white-space: nowrap;"> <a href="/contact">Contact us</a> <a href="/about">About us</a> <a href="/faq">Anticipated Questions</a></p>
         </div>
