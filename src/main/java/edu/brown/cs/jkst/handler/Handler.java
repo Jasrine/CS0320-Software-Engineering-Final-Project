@@ -72,10 +72,11 @@ public final class Handler {
       String genre = qm.value("genre");
       String decade = qm.value("decade");
       String service = qm.value("service");
-//      System.out.println(service + " " + decade + " " + genre + " " + search);
+      // System.out.println(service + " " + decade + " " + genre + " " +
+      // search);
       List<Movie> results = SearchCommand.INSTANCE.search(search, decade,
           region, genre, service);
-//      System.out.println(results.toString());
+      // System.out.println(results.toString());
       Map<String, Object> variables = ImmutableMap.of("title",
           "Film suggestions", "results", results);
       return GSON.toJson(variables);
@@ -89,36 +90,44 @@ public final class Handler {
     @Override
     public String handle(Request req, Response res) {
       QueryParamsMap qm = req.queryMap();
-      String search = qm.value("search");
-      String region = qm.value("region");
-      String genre = qm.value("genre");
-      String decade = qm.value("decade");
-      String service = qm.value("service");
 
-      String filmId = qm.value("filmId");
+      String filmId = qm.value("id");
       String filmName = qm.value("filmName");
-      int filmYear = (qm.value("filmYear") != null) ? Integer.parseInt(qm.value(
-          "filmYear")) : 0;
-      String filmDirector = qm.value("filmDirector");
-      String filmRegion = qm.value("filmRegion");
+      int filmYear = (qm.value("year") != null) ? Integer.parseInt(qm.value(
+          "year")) : 0;
+      String filmDirector = qm.value("director");
+      String filmRegion = qm.value("region") != null ? qm.value("region") : "";
       List<String> filmRegions = new LinkedList<String>();
       for (String regions : filmRegion.split(", ")) {
         filmRegions.add(regions);
       }
-      String filmGenre = qm.value("filmGenres");
+
+      String filmGenre = qm.value("genres") != null ? qm.value("genres") : "";
       List<String> filmGenres = new LinkedList<String>();
       for (String genres : filmGenre.split(", ")) {
         filmGenres.add(genres);
       }
+      double rating = qm.value("rating") != null ? Double.parseDouble(qm.value(
+          "rating")) : 0.0;
+      int votes = qm.value("votes") != null ? Integer.parseInt(qm.value(
+          "votes")) : 0;
       Movie m = new Movie(filmId, filmName, filmYear, filmGenres, filmRegions,
-          0, 0);
+          rating, votes);
+      m.setDirector(filmDirector);
+
+      String cast = qm.value("cast") != null ? qm.value("cast") : "";
+      m.setCast(cast.split(","));
 
       List<Movie> results = SelectCommand.INSTANCE.getSimilarMovies(m);
-      System.out.println("results: " + results.size());
       List<String> regions = FilmQuery.getRegions();
       List<String> genres = FilmQuery.getGenres();
       List<String> decades = FilmQuery.getDecades();
       List<String> services = FilmQuery.getServices();
+
+      System.out.println("Printing similar movies");
+      for (Movie r : results) {
+        System.out.println(r);
+      }
       Map<String, Object> variables = new ImmutableMap.Builder<String, Object>()
           .put("title", "Film suggestions")
           .put("results", results)

@@ -7,7 +7,7 @@ class Film {
 	/*
 	 * contains relevant information for the class 
 	 */
-	constructor(id, title, director, genres, year, regions, img, cast) {
+	constructor(id, title, director, genres, year, regions, img, cast, numVotes, rating) {
 		this.id = id;
 		this.title = title;
 		this.director = director;
@@ -16,6 +16,8 @@ class Film {
 		this.regions = regions;
 		this.img = img;
 		this.cast = cast;
+		this.numVotes = numVotes;
+		this.rating = rating;
 	}
 
 	toString() {
@@ -46,7 +48,7 @@ class Film {
 		if (regionStr != undefined && regionStr != null && regionStr.length > 0) {
 			resultStr += ("\n Regions: " + regionStr.trim());
 		}
-		if (this.cast != undefined && this.cast != null && this.cast.length > 0) {
+		if (this.cast != undefined && this.cast != null && this.cast.length > 0 && this.cast[0].trim().length > 0) {
 			let castLine = this.cast.join(", ").trim();
 			let castStr = "";
 			while (castLine.length > 80) {
@@ -55,6 +57,9 @@ class Film {
 				piece = piece.substring(0, lastSpace);
 				castStr = castStr + piece.concat("\n");
 				castLine = castLine.substring(lastSpace + 1, line.length - 1);
+			}
+			if (castStr.length < 1) {
+				castStr = castLine;
 			}
 
 			resultStr += ("\n Cast: " + castStr.trim());
@@ -141,32 +146,41 @@ const services = document.getElementById("services");
 
 document.getElementById("searchResults").addEventListener("click", function(e) {
 	console.log(e);
-  if (e.target && e.target.matches("p.film-widget")) {
-
+    if (e.target && e.target.matches("p.film-widget")) {
+	  	const f = e.target.potato;
+	  	const params = {
+			id: f.id,
+			filmName: f.title,
+			director: f.director,
+			img: f.img,
+			genres: f.genres,
+			year: f.year,
+			regions: f.regions,
+			rating: f.rating,
+			votes: f.numVotes,
+			cast: f.cast,
+		}
+		console.log(params);
    	$.post("/similarity", params, responseJSON => {
    		const responseObject = JSON.parse(responseJSON);
    		responseObject.results.forEach(suggestion => {
 			let f = new Film(suggestion.id, suggestion.filmName, suggestion.director, suggestion.genres,
-		 		suggestion.year, suggestion.regions, suggestion.img, "");
-
-
+		 		suggestion.year, suggestion.regions, suggestion.img, suggestion.cast, suggestion.numVotes,
+		 		suggestion.rating);
 			console.log(suggestion);
-			const $node = document.createElement('p');//$("<li class=\"ui-widget-content\">").text(f.toString());
+			const $node = document.createElement('p');
 			$node.setAttribute('class', 'nested-film-widget');
 			$node.setAttribute('innerHTML', f.toString());
 			$node.setAttribute('innerText', f.toString());
 			$node.textContent = f.toString();
-		// 				//$node.style = "opacity: 0.5; padding-left: 5px; text-align: left;";
-			$nestedResults.append($node);
+			$searchResults.append($node);
 			console.log($node);
 			if (suggestion.img != null && suggestion.img != undefined && suggestion.img.length > 0) {
 				let img = preloadImage(suggestion.img);
-							// img.width = 300;
-							// img.height = 300;
 				if (img == null || img == undefined) {
 					img = preloadImage('/css/images/Question-Mark.png');
 				}
-				$nestedResults.append(img);
+				$searchResults.append(img);
 			} else {
 				let img = preloadImage('/css/images/Question-Mark.png');
 				$searchResults.append(img);
@@ -233,11 +247,13 @@ $(document).ready(() => {
 					}
 					responseObject.results.forEach(suggestion => {
 						let f = new Film(suggestion.id, suggestion.filmName, suggestion.director, suggestion.genres,
-							suggestion.year, suggestion.regions, suggestion.img, suggestion.cast);
+							suggestion.year, suggestion.regions, suggestion.img, suggestion.cast, suggestion.numVotes,
+							suggestion.rating);
 						const $node = document.createElement('p');
 						$node.setAttribute('class', 'film-widget');
 						$node.setAttribute('innerHTML', f.toString());
 						$node.setAttribute('innerText', f.toString());
+						$node.potato = f;
 						$node.textContent = f.toString();
 						$searchResults.append($node);
 						if (suggestion.img != null && suggestion.img != undefined && suggestion.img.length > 0) {
