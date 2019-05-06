@@ -208,6 +208,9 @@ public class Movie implements Comparable<Movie> {
     return this.numVotes;
   }
 
+  public int getYear() {
+    return this.year;
+  }
   /**
    * raw ranking for searches that are NOT by similarity.
    *
@@ -357,16 +360,16 @@ public class Movie implements Comparable<Movie> {
     // the "similarity" is inflated, making the "better" movie a more appealing
     // suggestion.
     double ratingScore = 1.0 - (Math.abs(this.rating - m.rating) * 0.1);
-    return directorScore + genreScore + ratingScore;
-  }
+    double yearScore = 1.0 - (Math.abs(this.year - m.year) / 50.0);
+    // TODO: crewScore (similar to genre score but with no weight on order?)
+    // TODO: regionScore (positive or negative depending on preference?)
+    // TODO: titleScore (? [still not sure that this is an important metric])
+    // TODO: awardScore (?? [dependent on ability to get more data])
 
-  /**
-   * Getter for the movie's release year.
-   * 
-   * @return the year for the movie's release.
-   */
-  public int getYear() {
-    return this.year;
+    // TODO: all parts of the score should be toggleable based on search
+    // settings
+
+    return directorScore + genreScore + ratingScore + yearScore;
   }
 
   @Override

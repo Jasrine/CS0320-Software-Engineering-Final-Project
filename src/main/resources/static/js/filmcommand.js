@@ -250,11 +250,9 @@ $(document).ready(() => {
 					$searchResults.append($node);
 				});
 			} else {
-				console.log("SUGGEST");
 				console.log(params);
 				$.post("/suggest", params, responseJSON => {
 					const responseObject = JSON.parse(responseJSON);
-					console.log(responseObject);
 					let i = 0;
 					for (let j = $suggestions[0].children.length-1; j >= 0; j--) {
 						$suggestions[0].removeChild($suggestions[0].children[j]);
