@@ -85,13 +85,6 @@ function getSelectedOption(sel) {
 function preloadImage(url) {
     let img = new Image();
 	img.src = url;
-    if (img.width > img.height) {
-    	img.style.width = '120px';
-    	img.style.height = 'auto';
-    } else {
-    	img.style.height = '120px';
-    	img.style.width = 'auto';
-    }
     return img;
 }
 
@@ -142,30 +135,21 @@ const services = document.getElementById("services");
 document.getElementById("searchResults").addEventListener("click", function(e) {
 	console.log(e);
   if (e.target && e.target.matches("p.film-widget")) {
-
-  // 	const params = {
-
-  // 	};
    	$.post("/similarity", params, responseJSON => {
    		const responseObject = JSON.parse(responseJSON);
    		responseObject.results.forEach(suggestion => {
 			let f = new Film(suggestion.id, suggestion.filmName, suggestion.director, suggestion.genres,
 		 		suggestion.year, suggestion.regions, suggestion.img, "");
-
-
 			console.log(suggestion);
-			const $node = document.createElement('p');//$("<li class=\"ui-widget-content\">").text(f.toString());
+			const $node = document.createElement('p');
 			$node.setAttribute('class', 'nested-film-widget');
 			$node.setAttribute('innerHTML', f.toString());
 			$node.setAttribute('innerText', f.toString());
 			$node.textContent = f.toString();
-		// 				//$node.style = "opacity: 0.5; padding-left: 5px; text-align: left;";
 			$nestedResults.append($node);
 			console.log($node);
 			if (suggestion.img != null && suggestion.img != undefined && suggestion.img.length > 0) {
 				let img = preloadImage(suggestion.img);
-							// img.width = 300;
-							// img.height = 300;
 				if (img == null || img == undefined) {
 					img = preloadImage('/css/images/Question-Mark.png');
 				}
@@ -183,8 +167,7 @@ document.getElementById("searchResults").addEventListener("click", function(e) {
 });
 
 document.getElementById("suggestions").addEventListener("click", function(e) {
-	//console.log(e);
-  if (e.target && e.target.matches("p.suggestions-widget")) {
+  if (e.target && e.target.matches("td.suggestions-widget-td")) {
     $searchQuery.value = e.target.innerHTML;
     $searchQuery.val(e.target.innerHTML);
   }
@@ -197,7 +180,6 @@ $(document).ready(() => {
 	let service_i = 1;
 
 	wait(8000);
-	// initialization
 	$.post("/init", {}, responseJSON => {
 			const responseObject = JSON.parse(responseJSON);
 			region_i = addOptions(responseObject.regions, regions, region_i);
@@ -234,26 +216,38 @@ $(document).ready(() => {
 					for (let j = $searchResults[0].children.length-1; j >= 0; j--) {
 						$searchResults[0].removeChild($searchResults[0].children[j]);
 					}
+					const $node = document.createElement('table');
+					$node.setAttribute('class', 'film-widget-table');
 					responseObject.results.forEach(suggestion => {
 						let f = new Film(suggestion.id, suggestion.filmName, suggestion.director, suggestion.genres,
 							suggestion.year, suggestion.regions, suggestion.img, suggestion.cast);
-						const $node = document.createElement('p');
-						$node.setAttribute('class', 'film-widget');
-						$node.setAttribute('innerHTML', f.toString());
-						$node.setAttribute('innerText', f.toString());
-						$node.textContent = f.toString();
-						$searchResults.append($node);
+						var row = document.createElement("tr");
+						row.setAttribute('class', 'film-widget');
+						row.setAttribute('innerHTML', f.toString());
+						row.setAttribute('innerText', f.toString());
+						var cell = document.createElement("td");
+						var cellText = document.createTextNode(f.toString());
+						cell.appendChild(cellText);
+						row.appendChild(cell);
 						if (suggestion.img != null && suggestion.img != undefined && suggestion.img.length > 0) {
 							let img = preloadImage(suggestion.img);
 							if (img == null || img == undefined) {
 								img = preloadImage('/css/images/Question-Mark.png');
 							}
-							$searchResults.append(img);
+							var cell2 = document.createElement("td");
+							img.setAttribute('class', 'film-widget-td-img');
+							cell2.appendChild(img);
+							row.appendChild(cell2);
 						} else {
 							let img = preloadImage('/css/images/Question-Mark.png');
-							$searchResults.append(img);
+							var cell2 = document.createElement("td");
+							img.setAttribute('class', 'film-widget-td-img');
+							cell2.appendChild(img);
+							row.appendChild(cell2);
 						}
+						$node.appendChild(row);
 					});
+					$searchResults.append($node);
 				});
 			} else {
 				console.log("SUGGEST");
@@ -265,13 +259,20 @@ $(document).ready(() => {
 					for (let j = $suggestions[0].children.length-1; j >= 0; j--) {
 						$suggestions[0].removeChild($suggestions[0].children[j]);
 					}
+					const $node = document.createElement('table');
+					$node.setAttribute('class', 'suggestions-widget-table');
 					responseObject.suggestions.split("\n").forEach(suggestion => {
-						const $node = document.createElement('p');
-						$node.setAttribute('class', 'suggestions-widget');
-						$node.textContent = suggestion;
-						$suggestions.append($node);
+						let row = document.createElement("tr");
+						row.setAttribute('class', 'suggestions-widget');
+						let cell = document.createElement("td");
+						cell.setAttribute('class', 'suggestions-widget-td');
+						let cellText = document.createTextNode(suggestion);
+						cell.appendChild(cellText);
+						row.appendChild(cell);
+						$node.appendChild(row);
 						i = i + 1;
 					});
+					$suggestions.append($node);
 				});
 			}
 		}
