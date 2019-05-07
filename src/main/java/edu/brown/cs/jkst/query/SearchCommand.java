@@ -148,9 +148,9 @@ public final class SearchCommand implements Command {
             e.printStackTrace();
           }
         }
-        if (region != null && region.length() > 0) {
+        if (region != null && region.trim().length() > 0) {
           counter++;
-          prep.setString(counter, region);
+          prep.setString(counter, "%" + region.trim() + "%");
         }
         if (genres != null && genres.length() > 0) {
           counter++;
