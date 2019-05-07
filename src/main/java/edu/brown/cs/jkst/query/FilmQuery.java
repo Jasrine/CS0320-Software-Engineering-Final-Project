@@ -325,20 +325,37 @@ public final class FilmQuery {
       if (!rs.wasNull()) {
         m.setImgURL(url);
       }
-      String director = rs.wasNull() ? "" : rs.getString(ELEVEN);
+      String director = rs.getString(ELEVEN);
+      if (rs.wasNull()) {
+        director = "";
+      }
       m.setDirector(director);
 
-      String cast = rs.wasNull() ? "" : rs.getString(TWELVE);
+      String cast = rs.getString(TWELVE);
+      if (rs.wasNull()) {
+        cast = "";
+      }
+//      m.setCast(cast.split(","));
       if (cast != null) {
         m.setCast(cast.split(","));
       }
       if (numResults < maxNumResults) {
         bestMovies.add(m);
         numResults++;
+      } else if (comp != null) {
+        if (comp.compare(m, bestMovies.peek()) > 0) {
+          bestMovies.poll();
+          bestMovies.add(m);
+        }
       } else if (m.compareTo(bestMovies.peek()) > 0) {
+//        System.out.println(m.getFilmname() + " -> " +m.rawRank() + " | " + bestMovies.peek().rawRank() + " <- " + bestMovies.peek().getFilmname());
         bestMovies.poll();
         bestMovies.add(m);
       }
+//      else if (comp.compare(m, bestMovies.peek()) > 0/*m.compareTo(bestMovies.peek()) > 0*/) {
+//        bestMovies.poll();
+//        bestMovies.add(m);
+//      }
     }
     rs.close();
     prep.close();

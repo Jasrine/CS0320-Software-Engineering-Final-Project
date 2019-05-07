@@ -148,7 +148,7 @@ public final class SearchCommand implements Command {
             e.printStackTrace();
           }
         }
-        if (region != null && region.length() > 0) {
+        if (region != null && region.trim().length() > 0) {
           counter++;
           prep.setString(counter, "%" + region.trim() + "%");
         }
@@ -167,7 +167,7 @@ public final class SearchCommand implements Command {
         System.out.println("SQL error!");
       }
     }
-    Collections.reverse(output);
+//    Collections.reverse(output);
     return output;
   }
 

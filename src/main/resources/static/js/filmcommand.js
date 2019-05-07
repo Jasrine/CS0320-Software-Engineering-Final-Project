@@ -171,18 +171,25 @@ document.getElementById("searchResults").addEventListener("click", function(e) {
 	switchLoading();
     if (e.target && e.target.matches("td")) {
 	  	const f = e.target.potato;
+	  	let castString = "";
+	  	for (let i = 0; i < f.cast.length; i++) {
+	  	  castString = castString + "," + f.cast[i];
+        }
 	  	const params = {
 			id: f.id,
 			filmName: f.title,
 			director: f.director,
 			img: f.img,
-			genres: f.genres,
+			genreA: f.genres[0],
+            genreB: f.genres[1],
+            genreC: f.genres[2],
 			year: f.year,
 			regions: f.regions,
 			rating: f.rating,
 			votes: f.numVotes,
-			cast: f.cast,
-		}
+			// cast: f.cast,
+            cast: castString,
+		};
 		console.log(params);
    	$.post("/similarity", params, responseJSON => {
    		const responseObject = JSON.parse(responseJSON);

@@ -1,5 +1,6 @@
 package edu.brown.cs.jkst.handler;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -98,15 +99,15 @@ public final class Handler {
       String filmDirector = qm.value("director");
       String filmRegion = qm.value("region") != null ? qm.value("region") : "";
       List<String> filmRegions = new LinkedList<String>();
-      for (String regions : filmRegion.split(", ")) {
-        filmRegions.add(regions);
-      }
-
-      String filmGenre = qm.value("genres") != null ? qm.value("genres") : "";
+      filmRegions.addAll(Arrays.asList(filmRegion.split(", ")));
+      String filmGenreA = qm.value("genreA") != null ? qm.value("genreA") : "";
+      String filmGenreB = qm.value("genreB") != null ? qm.value("genreB") : "";
+      String filmGenreC = qm.value("genreC") != null ? qm.value("genreC") : "";
       List<String> filmGenres = new LinkedList<String>();
-      for (String genres : filmGenre.split(", ")) {
-        filmGenres.add(genres);
-      }
+//      filmGenres.addAll(Arrays.asList(filmGenre.split(", ")));
+      filmGenres.add(filmGenreA);
+      filmGenres.add(filmGenreB);
+      filmGenres.add(filmGenreC);
       double rating = qm.value("rating") != null ? Double.parseDouble(qm.value(
           "rating")) : 0.0;
       int votes = qm.value("votes") != null ? Integer.parseInt(qm.value(

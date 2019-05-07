@@ -4,6 +4,7 @@ import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -42,14 +43,38 @@ public final class SelectCommand implements Command {
       try {
         PreparedStatement prep
                 = conn.prepareStatement("SELECT DISTINCT * FROM titles");
+        System.out.println("Getting similar movies...");
         output = FilmQuery.topMovies(prep, new RelativeSimilarity(m),
                 NUM_RESULTS);
+        System.out.println("Similar movies retrieved.");
 //        getCrew(output);
       } catch (SQLException e) {
         e.printStackTrace();
       }
     }
-    output.add(m);
+//    System.out.println("-----------------------------------------------------");
+//    for(Movie mov : output) {
+//      int castOverlap1 = 0;
+//      for (String castMember : m.getCast()) {
+//        if (!castMember.equals("")) {
+//          if (mov.getCast().contains(castMember)) {
+//            System.out.print(" <" + castMember + "> ");
+//            castOverlap1++;
+//          }
+//        }
+//      }
+//      System.out.print("cast: " + castOverlap1);
+//      boolean directorMatch1 = mov.getDirector().equals(m.getDirector());
+//      System.out.print(" | dir: " + directorMatch1);
+//      int genreScore1 = m.genreSimilarity2(mov);
+//      System.out.print(" | genre: " + genreScore1);
+//      int simScore = castOverlap1 + 1;
+//      simScore *= (directorMatch1 ? 10 : 1);
+//      simScore = (genreScore1 + simScore) / 2;
+//      System.out.println(" | score: " + simScore + ": " + mov.getFilmname());
+//    }
+    output.sort(new RelativeSimilarity(m));
+    Collections.reverse(output);
     return output;
   }
 }
