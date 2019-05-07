@@ -167,7 +167,7 @@ public final class SearchCommand implements Command {
         System.out.println("SQL error!");
       }
     }
-    Collections.reverse(output);
+//    Collections.reverse(output);
     return output;
   }
 

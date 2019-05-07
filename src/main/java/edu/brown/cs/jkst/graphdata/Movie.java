@@ -1,11 +1,6 @@
 package edu.brown.cs.jkst.graphdata;
 
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  * class describing a film node, implements our node interface.
@@ -87,9 +82,11 @@ public class Movie implements Comparable<Movie> {
    *          array of strings with cast member names.
    */
   public void setCast(String[] castMembers) {
-    for (String castMember : castMembers) {
-      this.cast.add(castMember);
-    }
+    this.cast.addAll(Arrays.asList(castMembers));
+  }
+
+  public List<String> getCast() {
+    return this.cast;
   }
 
   /**
@@ -257,6 +254,7 @@ public class Movie implements Comparable<Movie> {
     dataCompleteness *= compWeight;
     yearScore *= yearWeight;
     ratingScore *= rateWeight;
+//    return ratingScore;
     return dataCompleteness * Math.sqrt(yearScore * yearScore
         + ratingScore * ratingScore);
   }
@@ -291,6 +289,141 @@ public class Movie implements Comparable<Movie> {
         Comparator.comparingDouble(this::scoreSimilarity));
     suggestions.addAll(movies);
     return suggestions;
+  }
+
+  public int genreSimilarity2(Movie m) {
+    int numGenresThis = this.genres.size();
+    int numGenresThat = m.genres.size();
+    int genreScore = 0;
+    String AA = "1A";
+    String aa = "2a";
+    String BB = "1B";
+    String bb = "2b";
+    String CC = "1C";
+    String cc = "2c";
+    if (numGenresThis > 0) {
+      AA = this.genres.get(0).toLowerCase();
+      if (AA.isEmpty()) {
+        AA = "1A";
+      }
+      if (numGenresThis > 1) {
+        BB = this.genres.get(1).toLowerCase();
+        if (BB.isEmpty()) {
+          BB = "1B";
+        }
+        if (numGenresThis > 2) {
+          CC = this.genres.get(2).toLowerCase();
+          if (CC.isEmpty()) {
+            CC = "1C";
+          }
+        }
+      }
+    }
+    if (numGenresThat > 0) {
+      aa = m.genres.get(0).toLowerCase();
+      if (aa.isEmpty()) {
+        aa = "2a";
+      }
+      if (numGenresThat > 1) {
+        bb = m.genres.get(1).toLowerCase();
+        if (bb.isEmpty()) {
+          bb = "2b";
+        }
+        if (numGenresThat > 2) {
+          cc = m.genres.get(2).toLowerCase();
+          if (cc.isEmpty()) {
+            cc = "2c";
+          }
+        }
+      }
+    }
+    System.out.print(" [" + AA + ", " + BB + ", " + CC + "][" + aa + ", " + bb + ", " + cc + "] ");
+    return genreSimilarity(m);
+  }
+
+
+  public int genreSimilarity(Movie m) {
+    int numGenresThis = this.genres.size();
+    int numGenresThat = m.genres.size();
+    int genreScore = 0;
+    String AA = "1A";
+    String aa = "2a";
+    String BB = "1B";
+    String bb = "2b";
+    String CC = "1C";
+    String cc = "2c";
+    if (numGenresThis > 0) {
+      AA = this.genres.get(0).toLowerCase();
+      if (AA.isEmpty()) {
+        AA = "1A";
+      }
+      if (numGenresThis > 1) {
+        BB = this.genres.get(1).toLowerCase();
+        if (BB.isEmpty()) {
+          BB = "1B";
+        }
+        if (numGenresThis > 2) {
+          CC = this.genres.get(2).toLowerCase();
+          if (CC.isEmpty()) {
+            CC = "1C";
+          }
+        }
+      }
+    }
+    if (numGenresThat > 0) {
+      aa = m.genres.get(0).toLowerCase();
+      if (aa.isEmpty()) {
+        aa = "2a";
+      }
+      if (numGenresThat > 1) {
+        bb = m.genres.get(1).toLowerCase();
+        if (bb.isEmpty()) {
+          bb = "2b";
+        }
+        if (numGenresThat > 2) {
+          cc = m.genres.get(2).toLowerCase();
+          if (cc.isEmpty()) {
+            cc = "2c";
+          }
+        }
+      }
+    }
+
+    boolean isOverlap1 = true;
+    if (aa.equals(AA)) {
+      genreScore += 39;
+    } else if (aa.equals(BB)) {
+      genreScore += 36;
+    } else if (aa.equals(CC)) {
+      genreScore += 33;
+    } else {
+      isOverlap1 = false;
+    }
+    boolean isOverlap2 = true;
+    if (bb.equals(AA)) {
+      genreScore += 26;
+    } else if (bb.equals(BB)) {
+      genreScore += 24;
+    } else if (bb.equals(CC)) {
+      genreScore += 22;
+    } else {
+      isOverlap2 = false;
+    }
+    boolean isOverlap3 = true;
+    if (cc.equals(AA)) {
+      genreScore += 13;
+    } else if (cc.equals(BB)) {
+      genreScore += 12;
+    } else if (cc.equals(CC)) {
+      genreScore += 11;
+    } else {
+      isOverlap3 = false;
+    }
+    if (isOverlap1 || isOverlap2 || isOverlap3) {
+      // adjust it so it's a scale of 0-100 (but first nonzero is 26)
+      genreScore += 26;
+    }
+    return genreScore;
   }
 
   /**
@@ -353,7 +486,6 @@ public class Movie implements Comparable<Movie> {
       genreScore += 26.0;
     }
     genreScore /= NORMALIZE_INTERNAL_RATING;
-
     // The smaller the difference in rating, the more similar the movies are
     // said
     // to be. This could be modified so that if the OTHER movie is rated higher

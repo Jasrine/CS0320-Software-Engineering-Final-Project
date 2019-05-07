@@ -3,7 +3,6 @@ package edu.brown.cs.jkst.movies;
 import edu.brown.cs.jkst.graphdata.Movie;
 
 import java.util.Comparator;
-import java.util.List;
 
 public class RelativeSimilarity implements Comparator<Movie> {
   private Movie movie;
@@ -53,22 +52,106 @@ public class RelativeSimilarity implements Comparator<Movie> {
    */
   @Override
   public int compare(Movie o1, Movie o2) {
-//    String filmName;
-////    String director;
-////    int year;
-//    List<String> genres;
-//    List<String> crew;
-//    List<String> regions;
-////    double rating;
-//    int numVotes;
-//
-//
-//    int yearScore1 = Math.abs(o1.getYear() - movie.getYear());
-//    int yearScore2 = Math.abs(o2.getYear() - movie.getYear());
+    int castOverlap1 = 0;
+    int castOverlap2 = 0;
+    for (String castMember : movie.getCast()) {
+      if (!castMember.equals("")) {
+        if (o1.getCast().contains(castMember)) {
+          castOverlap1++;
+        }
+        if (o2.getCast().contains(castMember)) {
+          castOverlap2++;
+        }
+      }
+    }
 
-//    return 0;
+    boolean directorMatch1 = o1.getDirector().equals(movie.getDirector());
+    boolean directorMatch2 = o2.getDirector().equals(movie.getDirector());
 
-    return Double.compare(movie.compareTo(o1), movie.compareTo(o2));
+    int genreScore1 = movie.genreSimilarity(o1);
+    int genreScore2 = movie.genreSimilarity(o2);
+
+    double r1 = o1.getRating() * (o1.getNumVotes() / 100);
+    double r2 = o2.getRating() * (o2.getNumVotes() / 100);
+    double rm = movie.getRating() * (movie.getNumVotes() / 100);
+    double rateDiff1 = Math.abs(r1 - rm);
+    double rateDiff2 = Math.abs(r2 - rm);
+
+    int y1 = o1.getYear();
+    int y2 = o2.getYear();
+    int ym = movie.getYear();
+    int yearDiff1 = Math.abs(y1 - ym);
+    int yearDiff2 = Math.abs(y2 - ym);
+
+    int o1Sim = sim(castOverlap1, directorMatch1, genreScore1, rateDiff1, yearDiff1);
+    int o2Sim = sim(castOverlap2, directorMatch2, genreScore2, rateDiff2, yearDiff2);
+
+//    if (o1Sim != 1) {
+//      System.out.println("-----------------------------------------------------");
+//      System.out.println(o1.getFilmname() + " : " + o1Sim);
+//      System.out.println(o2.getFilmname() + " : " + o2Sim);
+//    }
+
+
+
+    if (o1Sim > o2Sim) {
+      return 1;
+    } else if (o1Sim < o2Sim) {
+      return -1;
+    } else {
+      switch (o1Sim) {
+        case 3:
+          if (castOverlap1 > castOverlap2) {
+            return 1;
+          } else if (castOverlap1 < castOverlap2) {
+            return -1;
+          } else {
+            if (genreScore1 > genreScore2) {
+              return 1;
+            } else if (genreScore1 < genreScore2) {
+              return -1;
+            } else {
+              return Double.compare(rateDiff1, rateDiff2);
+            }
+          }
+        case 2:
+          return Integer.compare(genreScore1, genreScore2);
+        case 1:
+          if (genreScore1 > genreScore2) {
+            return 1;
+          } else if (genreScore1 < genreScore2) {
+            return -1;
+          } else {
+            return Double.compare(rateDiff1, rateDiff2);
+          }
+        default:
+          return 0;
+      }
+    }
+  }
+
+  private int sim(int castOverlap, boolean directorMatch, int genreScore, double rateDiff, int yearDiff) {
+    if (directorMatch && castOverlap >= 1) {
+      return 3;
+    } else if (directorMatch || castOverlap >= 2) {
+      return 2;
+    } else {
+      return 1;
+    }
+  }
+
+  public int compareCast(Movie o1, Movie o2) {
+    int overlap1 = 0;
+    int overlap2 = 0;
+    for (String castMember : movie.getCast()) {
+      if (o1.getCast().contains(castMember)) {
+        overlap1++;
+      }
+      if (o2.getCast().contains(castMember)) {
+        overlap2++;
+      }
+    }
+    return Integer.compare(overlap1, overlap2);
   }
 
   public int compareDirectors(Movie o1, Movie o2) {
@@ -111,7 +194,8 @@ public class RelativeSimilarity implements Comparator<Movie> {
   }
 
   public int compareRelativeGenres(Movie o1, Movie o2) {
-    return Integer.compare(movie.compareTo(o1), movie.compareTo(o2));
+    return Double.compare(movie.genreSimilarity(o1), movie.genreSimilarity(o2));
+//    return Integer.compare(movie.compareTo(o1), movie.compareTo(o2));
   }
 
   //biased towards higher ratings
