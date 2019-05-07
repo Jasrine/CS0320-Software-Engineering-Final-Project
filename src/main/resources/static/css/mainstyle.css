@@ -45,6 +45,10 @@ body {
   background-image: url("images/default_background.jpg");
   background-size: cover;
   color: white;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
 }
 
 .column1 {
@@ -184,6 +188,70 @@ body {
 }
 
 .filmElem img {
-   display:block; width:100%; height:auto;
+  display:block; 
+  width:100%; 
+  height:auto;
   overflow: hidden;
+}
+
+div[class*=container] {
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #8499B1;
+}
+
+.currFilm {
+  white-space: pre;
+  justify-content: space-around;
+}
+
+/*
+ BUTTON STYLING
+*/
+.search {
+  cursor: pointer;
+  position: relative;
+  color: white;
+  width: 70px;
+  height: 70px;
+  line-height: 70px;
+  transition: all 0.3s;
+}
+
+.search::before, .search::after {
+  content: '';
+  position: absolute;
+  transition: all 0.3s;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.search:hover::after {
+  animation-name: rotatecw;
+  animation-duration: 2s;
+}
+.search:hover::before {
+  animation-name: rotateccw; 
+  animation-duration: 3s;
+}
+.search:hover::after, .search:hover::before {
+  width: 70px;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+
+@keyframes rotatecw {
+    from {transform: rotate(0deg);}
+    to {transform: rotate(360deg);}
+}
+
+@keyframes rotateccw {
+    from {transform: rotate(0deg);}
+    to {transform: rotate(-360deg);}
 }

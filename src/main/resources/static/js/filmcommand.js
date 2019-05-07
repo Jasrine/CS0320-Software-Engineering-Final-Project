@@ -24,8 +24,8 @@ class Film {
 		let region = this.regions.join(", ");
 		let line = region;
 		let regionStr = "";
-		while (line.length > 80) {
-			let piece = line.substring(0, 80);
+		while (line.length > 70) {
+			let piece = line.substring(0, 70);
 			let lastSpace = piece.lastIndexOf(", ");
 			piece = piece.substring(0, lastSpace);
 			regionStr = regionStr + piece.concat("\n");
@@ -46,7 +46,20 @@ class Film {
 			// textNode.appendChild(document.createElement('b').appendChild(
 			// 	document.createTextNode("Director: ")));
 			// textNode.appendChild(document.createTextNode(this.director));
-			resultStr += ("\n Director: " + this.director);
+			let dirLine = this.director;
+			let dirStr = "";
+			while (dirLine.length > 70) {
+				let piece = dirLine.substring(0, 70);
+				let lastSpace = dirLine.lastIndexOf(", ");
+				piece = piece.substring(0, lastSpace);
+				dirStr = dirStr + piece.concat("\n");
+				dirLine = dirLine.substring(lastSpace + 1, line.length - 1);
+			}
+			if (dirStr.length < 1) {
+				dirStr = dirLine;
+			}
+
+			resultStr += ("\n Director: " + dirStr.trim());
 		}
 		if (this.genres != undefined && this.genres != null && this.genres.length > 0 && this.genres[0].trim().length > 0) {
 			// textNode.appendChild(document.createElement('br'));
@@ -64,8 +77,8 @@ class Film {
 		if (this.cast != undefined && this.cast != null && this.cast.length > 0 && this.cast[0].trim().length > 0) {
 			let castLine = this.cast.join(", ").trim();
 			let castStr = "";
-			while (castLine.length > 80) {
-				let piece = castLine.substring(0, 80);
+			while (castLine.length > 70) {
+				let piece = castLine.substring(0, 70);
 				let lastSpace = piece.lastIndexOf(", ");
 				piece = piece.substring(0, lastSpace);
 				castStr = castStr + piece.concat("\n");
@@ -152,7 +165,10 @@ const genres = document.getElementById("genres");
 const services = document.getElementById("services");
 const index = document.getElementById("index2");
 
+// getting similar movies
 document.getElementById("searchResults").addEventListener("click", function(e) {
+	currFilm.innerHTML = "";
+	switchLoading();
     if (e.target && e.target.matches("td")) {
 	  	const f = e.target.potato;
 	  	const params = {
@@ -209,14 +225,13 @@ document.getElementById("searchResults").addEventListener("click", function(e) {
 			}
 			$node.appendChild(row);
 		});
+		switchLoading();
 		$searchResults.append($node);
   	});
-  	const val = e.target.node;
-    $searchQuery.value = e.target.innerHTML;
-    $searchQuery.val(e.target.innerHTML);
   }
 });
 
+// getting suggestions.
 document.getElementById("suggestions").addEventListener("click", function(e) {
   if (e.target && e.target.matches("td.suggestions-widget-td")) {
     $searchQuery.value = e.target.innerHTML;
@@ -227,6 +242,82 @@ document.getElementById("suggestions").addEventListener("click", function(e) {
   }
 });
 
+// search results
+document.getElementById("result").addEventListener("click", function(e) {
+	console.log(e);
+	currFilm.innerHTML = "";
+	getResults();
+
+	if ($searchResults[0].children[0] != undefined && $searchResults[0].children[0].tBodies.length == 0) {
+		currFilm.innerHTML = "No results match your query.";
+	}
+});
+
+function getResults() {
+	// if a user presses enter, search through database with the options the user has selected.
+	currFilm.innerHTML = "";
+	switchLoading();
+	const region = (getSelectedOption(regions).value == 0) ? "" : getSelectedOption(regions).text;
+	const genre = (getSelectedOption(genres).value == 0) ? "" : getSelectedOption(genres).text;
+	const decade = (getSelectedOption(decades).value == 0) ? "" : getSelectedOption(decades).text;
+	const service = (getSelectedOption(services).value == 0) ? "" : getSelectedOption(services).text;
+	const params = {
+		"search": $searchQuery.val(),
+		"genre": genre,
+		"region": region,
+		"decade": decade,
+		"service": service
+	};
+	for (let j = $suggestions[0].children.length-1; j >= 0; j--) {
+		$suggestions[0].removeChild($suggestions[0].children[j]);
+	}
+	$.post("/search", params, responseJSON => {
+		const responseObject = JSON.parse(responseJSON);
+		console.log(responseObject);
+		for (let j = $searchResults[0].children.length-1; j >= 0; j--) {
+			$searchResults[0].removeChild($searchResults[0].children[j]);
+		}
+		const $node = document.createElement('table');
+		$node.setAttribute('class', 'film-widget-table');
+		responseObject.results.forEach(suggestion => {
+			let f = new Film(suggestion.id, suggestion.filmName, suggestion.director, suggestion.genres,
+				suggestion.year, suggestion.regions, suggestion.img, suggestion.cast);
+			var row = document.createElement("tr");
+			row.setAttribute('class', 'film-widget');
+			row.setAttribute('innerHTML', f.toString());
+			row.setAttribute('innerText', f.toString());
+			var cell = document.createElement("td");
+			var cellText = document.createTextNode(f.toString());
+			cell.potato = f;
+			cell.appendChild(cellText);
+			row.appendChild(cell);
+			if (suggestion.img != null && suggestion.img != undefined && suggestion.img.length > 0) {
+				let img = preloadImage(suggestion.img);
+				if (img == null || img == undefined) {
+					img = preloadImage('/css/images/Question-Mark.png');
+				}
+				var cell2 = document.createElement("td");
+				img.setAttribute('class', 'film-widget-td-img');
+				cell2.appendChild(img);
+				row.appendChild(cell2);
+				currFilm.innerHTML = "";
+			} else {
+				let img = preloadImage('/css/images/Question-Mark.png');
+				var cell2 = document.createElement("td");
+				img.setAttribute('class', 'film-widget-td-img');
+				cell2.appendChild(img);
+				row.appendChild(cell2);
+				currFilm.innerHTML = "";
+			}
+			$node.appendChild(row);
+
+		});
+		$searchResults.append($node);
+
+	});
+	switchLoading();
+}
+
 $(document).ready(() => {
 	let region_i = 1;
 	let genre_i = 1;
@@ -234,7 +325,7 @@ $(document).ready(() => {
 	let service_i = 1;
 
 	if (region_i < 2) {
-		wait(8000);
+		wait(7000);
 	
 		$.post("/init", {}, responseJSON => {
 			const responseObject = JSON.parse(responseJSON);
@@ -265,51 +356,52 @@ $(document).ready(() => {
 			// when enter is pressed
 			if (event.which == 13) {
 				// if a user presses enter, search through database with the options the user has selected.
-				for (let j = $suggestions[0].children.length-1; j >= 0; j--) {
-					$suggestions[0].removeChild($suggestions[0].children[j]);
-				}
+				getResults();
+				// for (let j = $suggestions[0].children.length-1; j >= 0; j--) {
+				// 	$suggestions[0].removeChild($suggestions[0].children[j]);
+				// }
 
-				$.post("/search", params, responseJSON => {
-					const responseObject = JSON.parse(responseJSON);
-					console.log(responseObject);
+				// $.post("/search", params, responseJSON => {
+				// 	const responseObject = JSON.parse(responseJSON);
+				// 	console.log(responseObject);
 
-					for (let j = $searchResults[0].children.length-1; j >= 0; j--) {
-						$searchResults[0].removeChild($searchResults[0].children[j]);
-					}
-					const $node = document.createElement('table');
-					$node.setAttribute('class', 'film-widget-table');
-					responseObject.results.forEach(suggestion => {
-						let f = new Film(suggestion.id, suggestion.filmName, suggestion.director, suggestion.genres,
-							suggestion.year, suggestion.regions, suggestion.img, suggestion.cast);
-						var row = document.createElement("tr");
-						row.setAttribute('class', 'film-widget');
-						row.setAttribute('innerHTML', f.toString());
-						row.setAttribute('innerText', f.toString());
-						var cell = document.createElement("td");
-						var cellText = document.createTextNode(f.toString());
-						cell.potato = f;
-						cell.appendChild(cellText);
-						row.appendChild(cell);
-						if (suggestion.img != null && suggestion.img != undefined && suggestion.img.length > 0) {
-							let img = preloadImage(suggestion.img);
-							if (img == null || img == undefined) {
-								img = preloadImage('/css/images/Question-Mark.png');
-							}
-							var cell2 = document.createElement("td");
-							img.setAttribute('class', 'film-widget-td-img');
-							cell2.appendChild(img);
-							row.appendChild(cell2);
-						} else {
-							let img = preloadImage('/css/images/Question-Mark.png');
-							var cell2 = document.createElement("td");
-							img.setAttribute('class', 'film-widget-td-img');
-							cell2.appendChild(img);
-							row.appendChild(cell2);
-						}
-						$node.appendChild(row);
-					});
-					$searchResults.append($node);
-				});
+				// 	for (let j = $searchResults[0].children.length-1; j >= 0; j--) {
+				// 		$searchResults[0].removeChild($searchResults[0].children[j]);
+				// 	}
+				// 	const $node = document.createElement('table');
+				// 	$node.setAttribute('class', 'film-widget-table');
+				// 	responseObject.results.forEach(suggestion => {
+				// 		let f = new Film(suggestion.id, suggestion.filmName, suggestion.director, suggestion.genres,
+				// 			suggestion.year, suggestion.regions, suggestion.img, suggestion.cast);
+				// 		var row = document.createElement("tr");
+				// 		row.setAttribute('class', 'film-widget');
+				// 		row.setAttribute('innerHTML', f.toString());
+				// 		row.setAttribute('innerText', f.toString());
+				// 		var cell = document.createElement("td");
+				// 		var cellText = document.createTextNode(f.toString());
+				// 		cell.potato = f;
+				// 		cell.appendChild(cellText);
+				// 		row.appendChild(cell);
+				// 		if (suggestion.img != null && suggestion.img != undefined && suggestion.img.length > 0) {
+				// 			let img = preloadImage(suggestion.img);
+				// 			if (img == null || img == undefined) {
+				// 				img = preloadImage('/css/images/Question-Mark.png');
+				// 			}
+				// 			var cell2 = document.createElement("td");
+				// 			img.setAttribute('class', 'film-widget-td-img');
+				// 			cell2.appendChild(img);
+				// 			row.appendChild(cell2);
+				// 		} else {
+				// 			let img = preloadImage('/css/images/Question-Mark.png');
+				// 			var cell2 = document.createElement("td");
+				// 			img.setAttribute('class', 'film-widget-td-img');
+				// 			cell2.appendChild(img);
+				// 			row.appendChild(cell2);
+				// 		}
+				// 		$node.appendChild(row);
+				// 	});
+				// 	$searchResults.append($node);
+				// });
 			} else {
 				console.log(params);
 				$.post("/suggest", params, responseJSON => {
