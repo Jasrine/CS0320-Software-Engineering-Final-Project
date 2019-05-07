@@ -212,6 +212,7 @@ div[class*=container] {
 */
 .search {
   cursor: pointer;
+  margin-left: 45%;
   position: relative;
   color: white;
   width: 70px;

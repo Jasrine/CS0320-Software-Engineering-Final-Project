@@ -261,7 +261,7 @@ document.getElementById("result").addEventListener("click", function(e) {
 });
 
 function getResults() {
-	// if a user presses enter, search through database with the options the user has selected.
+	// if a user presses enter, search through database with the options the user has selected
 	currFilm.innerHTML = "";
 	switchLoading();
 	const region = (getSelectedOption(regions).value == 0) ? "" : getSelectedOption(regions).text;
@@ -347,6 +347,7 @@ $(document).ready(() => {
 	switchLoading();
 
 	($searchQuery).keyup(event => {
+		switchLoading();
 		if (event.which != 32) {	
 			const region = (getSelectedOption(regions).value == 0) ? "" : getSelectedOption(regions).text;
 			const genre = (getSelectedOption(genres).value == 0) ? "" : getSelectedOption(genres).text;
@@ -433,6 +434,7 @@ $(document).ready(() => {
 					$suggestions.append($node);
 				});
 			}
+			switchLoading();
 		}
 	});
 });

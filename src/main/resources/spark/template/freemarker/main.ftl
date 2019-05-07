@@ -83,8 +83,9 @@
                 <select name="services" id="services">
                     <option value="0">Select a streaming service.</option>
                 </select><br>
-                Here are suggestions:<br>
+                
                 <div class="search" id="result" name="result"><search><img src="css/images/play4.png" height="70" width="70"></search></div>
+                Here are suggestions:<br>
             </div>
 
             <p name="currFilm" id="currFilm" class="currFilm"></p>
