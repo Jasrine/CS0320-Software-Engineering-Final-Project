@@ -7,7 +7,7 @@ class Film {
 	/*
 	 * contains relevant information for the class 
 	 */
-	constructor(id, title, director, genres, year, regions, img, cast) {
+	constructor(id, title, director, genres, year, regions, img, cast, numVotes, rating) {
 		this.id = id;
 		this.title = title;
 		this.director = director;
@@ -16,6 +16,8 @@ class Film {
 		this.regions = regions;
 		this.img = img;
 		this.cast = cast;
+		this.numVotes = numVotes;
+		this.rating = rating;
 	}
 
 	toString() {
@@ -33,11 +35,24 @@ class Film {
 		if (regionStr.length < 1) {
 			regionStr = region;
 		}
+
+		//let textNode = document.createElement('b').appendChild(document.createTextNode("Film title: "));
+		//textNode.appendChild(document.createTextNode(this.title));
+		
+
 		let resultStr = " Film title: " + this.title;
 		if (this.director != undefined && this.director != null && this.director.trim().length > 0) {
+			// textNode.appendChild(document.createElement('br'));
+			// textNode.appendChild(document.createElement('b').appendChild(
+			// 	document.createTextNode("Director: ")));
+			// textNode.appendChild(document.createTextNode(this.director));
 			resultStr += ("\n Director: " + this.director);
 		}
-		if (this.genres != undefined && this.genres != null && this.genres.length > 0) {
+		if (this.genres != undefined && this.genres != null && this.genres.length > 0 && this.genres[0].trim().length > 0) {
+			// textNode.appendChild(document.createElement('br'));
+			// textNode.appendChild(document.createElement('b').appendChild(
+			// 	document.createTextNode("Genres: ")));
+			// textNode.appendChild(document.createTextNode(this.genres.join(", ")));
 			resultStr += ("\n Genres: " + this.genres.join(", "));
 		}
 		if (parseInt(this.year) > 0) {
@@ -46,7 +61,7 @@ class Film {
 		if (regionStr != undefined && regionStr != null && regionStr.length > 0) {
 			resultStr += ("\n Regions: " + regionStr.trim());
 		}
-		if (this.cast != undefined && this.cast != null && this.cast.length > 0) {
+		if (this.cast != undefined && this.cast != null && this.cast.length > 0 && this.cast[0].trim().length > 0) {
 			let castLine = this.cast.join(", ").trim();
 			let castStr = "";
 			while (castLine.length > 80) {
@@ -55,6 +70,9 @@ class Film {
 				piece = piece.substring(0, lastSpace);
 				castStr = castStr + piece.concat("\n");
 				castLine = castLine.substring(lastSpace + 1, line.length - 1);
+			}
+			if (castStr.length < 1) {
+				castStr = castLine;
 			}
 
 			resultStr += ("\n Cast: " + castStr.trim());
@@ -85,13 +103,6 @@ function getSelectedOption(sel) {
 function preloadImage(url) {
     let img = new Image();
 	img.src = url;
-    if (img.width > img.height) {
-    	img.style.width = '120px';
-    	img.style.height = 'auto';
-    } else {
-    	img.style.height = '120px';
-    	img.style.width = 'auto';
-    }
     return img;
 }
 
@@ -134,47 +145,71 @@ function wait(ms){
 const $searchQuery = $("#search");
 const $suggestions = $("#suggestions");
 const $searchResults = $("#searchResults");
+const currFilm = document.getElementById("currFilm");
 const regions = document.getElementById("regions");
 const decades = document.getElementById("decades");
 const genres = document.getElementById("genres");
 const services = document.getElementById("services");
+const index = document.getElementById("index2");
 
 document.getElementById("searchResults").addEventListener("click", function(e) {
-	console.log(e);
-  if (e.target && e.target.matches("p.film-widget")) {
-
-  // 	const params = {
-
-  // 	};
+    if (e.target && e.target.matches("td")) {
+	  	const f = e.target.potato;
+	  	const params = {
+			id: f.id,
+			filmName: f.title,
+			director: f.director,
+			img: f.img,
+			genres: f.genres,
+			year: f.year,
+			regions: f.regions,
+			rating: f.rating,
+			votes: f.numVotes,
+			cast: f.cast,
+		}
+		console.log(params);
    	$.post("/similarity", params, responseJSON => {
    		const responseObject = JSON.parse(responseJSON);
+   		index.style = "display:none;";
+   		for (let j = $searchResults[0].children.length-1; j >= 0; j--) {
+			$searchResults[0].removeChild($searchResults[0].children[j]);
+		}
+
+		currFilm.innerHTML = f.toString();
+
+   		const $node = document.createElement('table');
+		$node.setAttribute('class', 'film-widget-table');
    		responseObject.results.forEach(suggestion => {
 			let f = new Film(suggestion.id, suggestion.filmName, suggestion.director, suggestion.genres,
-		 		suggestion.year, suggestion.regions, suggestion.img, "");
-
-
-			console.log(suggestion);
-			const $node = document.createElement('p');//$("<li class=\"ui-widget-content\">").text(f.toString());
-			$node.setAttribute('class', 'nested-film-widget');
-			$node.setAttribute('innerHTML', f.toString());
-			$node.setAttribute('innerText', f.toString());
-			$node.textContent = f.toString();
-		// 				//$node.style = "opacity: 0.5; padding-left: 5px; text-align: left;";
-			$nestedResults.append($node);
-			console.log($node);
+							suggestion.year, suggestion.regions, suggestion.img, suggestion.cast);
+			var row = document.createElement("tr");
+			row.setAttribute('class', 'nested-film-widget');
+			row.setAttribute('innerHTML', f.toString());
+			row.setAttribute('innerText', f.toString());
+			let cell = document.createElement("td");
+			let cellText = document.createTextNode(f.toString());
+			cell.potato = f;
+			cell.appendChild(cellText);
+			row.appendChild(cell);
 			if (suggestion.img != null && suggestion.img != undefined && suggestion.img.length > 0) {
 				let img = preloadImage(suggestion.img);
-							// img.width = 300;
-							// img.height = 300;
-				if (img == null || img == undefined) {
+			    if (img == null || img == undefined) {
 					img = preloadImage('/css/images/Question-Mark.png');
 				}
-				$nestedResults.append(img);
+				let cell2 = document.createElement("td");
+				img.setAttribute('class', 'film-widget-td-img');
+				cell2.appendChild(img);
+				row.appendChild(cell2);
 			} else {
 				let img = preloadImage('/css/images/Question-Mark.png');
-				$searchResults.append(img);
+				let cell2 = document.createElement("td");
+				img.setAttribute('class', 'film-widget-td-img');
+				cell2.appendChild(img);
+				row.appendChild(cell2);
 			}
+			$node.appendChild(row);
 		});
+		$searchResults.append($node);
   	});
   	const val = e.target.node;
     $searchQuery.value = e.target.innerHTML;
@@ -183,10 +218,12 @@ document.getElementById("searchResults").addEventListener("click", function(e) {
 });
 
 document.getElementById("suggestions").addEventListener("click", function(e) {
-	//console.log(e);
-  if (e.target && e.target.matches("p.suggestions-widget")) {
+  if (e.target && e.target.matches("td.suggestions-widget-td")) {
     $searchQuery.value = e.target.innerHTML;
     $searchQuery.val(e.target.innerHTML);
+    for (let j = $suggestions[0].children.length-1; j >= 0; j--) {
+		$suggestions[0].removeChild($suggestions[0].children[j]);
+	}
   }
 });
 
@@ -196,9 +233,10 @@ $(document).ready(() => {
 	let decade_i = 1;
 	let service_i = 1;
 
-	wait(8000);
-	// initialization
-	$.post("/init", {}, responseJSON => {
+	if (region_i < 2) {
+		wait(8000);
+	
+		$.post("/init", {}, responseJSON => {
 			const responseObject = JSON.parse(responseJSON);
 			region_i = addOptions(responseObject.regions, regions, region_i);
 			genre_i = addOptions(responseObject.genres, genres, genre_i);
@@ -206,6 +244,7 @@ $(document).ready(() => {
 			service_i = addOptions(responseObject.services, services, service_i);
 			
 		});
+	}
 	console.log("done with init");
 	switchLoading();
 
@@ -226,52 +265,73 @@ $(document).ready(() => {
 			// when enter is pressed
 			if (event.which == 13) {
 				// if a user presses enter, search through database with the options the user has selected.
+				for (let j = $suggestions[0].children.length-1; j >= 0; j--) {
+					$suggestions[0].removeChild($suggestions[0].children[j]);
+				}
+
 				$.post("/search", params, responseJSON => {
 					const responseObject = JSON.parse(responseJSON);
-					console.log("TEST!!!\n");
 					console.log(responseObject);
 
 					for (let j = $searchResults[0].children.length-1; j >= 0; j--) {
 						$searchResults[0].removeChild($searchResults[0].children[j]);
 					}
+					const $node = document.createElement('table');
+					$node.setAttribute('class', 'film-widget-table');
 					responseObject.results.forEach(suggestion => {
 						let f = new Film(suggestion.id, suggestion.filmName, suggestion.director, suggestion.genres,
 							suggestion.year, suggestion.regions, suggestion.img, suggestion.cast);
-						const $node = document.createElement('p');
-						$node.setAttribute('class', 'film-widget');
-						$node.setAttribute('innerHTML', f.toString());
-						$node.setAttribute('innerText', f.toString());
-						$node.textContent = f.toString();
-						$searchResults.append($node);
+						var row = document.createElement("tr");
+						row.setAttribute('class', 'film-widget');
+						row.setAttribute('innerHTML', f.toString());
+						row.setAttribute('innerText', f.toString());
+						var cell = document.createElement("td");
+						var cellText = document.createTextNode(f.toString());
+						cell.potato = f;
+						cell.appendChild(cellText);
+						row.appendChild(cell);
 						if (suggestion.img != null && suggestion.img != undefined && suggestion.img.length > 0) {
 							let img = preloadImage(suggestion.img);
 							if (img == null || img == undefined) {
 								img = preloadImage('/css/images/Question-Mark.png');
 							}
-							$searchResults.append(img);
+							var cell2 = document.createElement("td");
+							img.setAttribute('class', 'film-widget-td-img');
+							cell2.appendChild(img);
+							row.appendChild(cell2);
 						} else {
 							let img = preloadImage('/css/images/Question-Mark.png');
-							$searchResults.append(img);
+							var cell2 = document.createElement("td");
+							img.setAttribute('class', 'film-widget-td-img');
+							cell2.appendChild(img);
+							row.appendChild(cell2);
 						}
+						$node.appendChild(row);
 					});
+					$searchResults.append($node);
 				});
 			} else {
-				console.log("SUGGEST");
 				console.log(params);
 				$.post("/suggest", params, responseJSON => {
 					const responseObject = JSON.parse(responseJSON);
-					console.log(responseObject);
 					let i = 0;
 					for (let j = $suggestions[0].children.length-1; j >= 0; j--) {
 						$suggestions[0].removeChild($suggestions[0].children[j]);
 					}
+					const $node = document.createElement('table');
+					$node.setAttribute('class', 'suggestions-widget-table');
 					responseObject.suggestions.split("\n").forEach(suggestion => {
-						const $node = document.createElement('p');
-						$node.setAttribute('class', 'suggestions-widget');
-						$node.textContent = suggestion;
-						$suggestions.append($node);
+						let row = document.createElement("tr");
+						row.setAttribute('class', 'suggestions-widget');
+						let cell = document.createElement("td");
+						cell.setAttribute('class', 'suggestions-widget-td');
+						let cellText = document.createTextNode(suggestion);
+						cell.appendChild(cellText);
+						row.appendChild(cell);
+						$node.appendChild(row);
 						i = i + 1;
 					});
+					$suggestions.append($node);
 				});
 			}
 		}

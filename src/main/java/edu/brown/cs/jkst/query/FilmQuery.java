@@ -25,22 +25,23 @@ import edu.brown.cs.jkst.trie.Trie;
  * class that handles many SQL queries for the application.
  */
 public final class FilmQuery {
-  public static int ONE = 1;
-  public static int TWO = 2;
-  public static int THREE = 3;
-  public static int FOUR = 4;
-  public static int FIVE = 5;
-  public static int SIX = 6;
-  public static int SEVEN = 7;
-  public static int EIGHT = 8;
-  public static int NINE = 9;
-  public static int TEN = 10;
-  public static int ELEVEN = 11;
-  public static int TWELVE = 12;
+  public static final int ONE = 1;
+  public static final int TWO = 2;
+  public static final int THREE = 3;
+  public static final int FOUR = 4;
+  public static final int FIVE = 5;
+  public static final int SIX = 6;
+  public static final int SEVEN = 7;
+  public static final int EIGHT = 8;
+  public static final int NINE = 9;
+  public static final int TEN = 10;
+  public static final int ELEVEN = 11;
+  public static final int TWELVE = 12;
   public static final FilmQuery INSTANCE = new FilmQuery();
   private static Trie<Character> trie = new Trie<Character>();
   private static List<String> regions = new LinkedList<String>();
   private static int numResults = 5;
+  private static int FINALRESULTS = 100;
   private static Connection conn = null;
   private static String[] genres = {
       "Short", "Comedy", "Documentary", "Sport", "Romance", "Family", "Drama",
@@ -263,17 +264,29 @@ public final class FilmQuery {
     }
   }
 
+  /**
+   * gets the top movies.
+   *
+   * @param prep
+   *          prepared statement
+   * @param comp
+   *          comparator
+   * @param maxNumResults
+   *          maximum results allowed
+   * @return list of movies
+   * @throws SQLException
+   *           exception.
+   */
   public static List<Movie> topMovies(PreparedStatement prep,
-                                      Comparator<Movie> comp,
-                                      int max_num_results) throws SQLException {
+      Comparator<Movie> comp, int maxNumResults) throws SQLException {
     List<Movie> output = new LinkedList<>();
     ResultSet rs = prep.executeQuery();
-    PriorityQueue<Movie> bestMovies
-            = new PriorityQueue<>(max_num_results, comp);
+    PriorityQueue<Movie> bestMovies = new PriorityQueue<>(maxNumResults,
+        comp);
     int numResults = 0;
     while (rs.next()) {
       String id = rs.getString(ONE);
-      //TODO: this is where we'd get the movie from the cache, if we had one
+      // TODO: this is where we'd get the movie from the cache, if we had one
       String regionsRaw = rs.getString(TWO);
       if (rs.wasNull()) {
         regionsRaw = "";
@@ -307,7 +320,7 @@ public final class FilmQuery {
         numVotes = 0;
       }
       Movie m = new Movie(id, filmName, year, genreLst,
-              regions, rating, numVotes);
+          regions, rating, numVotes);
       String url = rs.getString(NINE);
       if (!rs.wasNull()) {
         m.setImgURL(url);
@@ -319,7 +332,7 @@ public final class FilmQuery {
       if (cast != null) {
         m.setCast(cast.split(","));
       }
-      if (numResults < max_num_results) {
+      if (numResults < maxNumResults) {
         bestMovies.add(m);
         numResults++;
       } else if (m.compareTo(bestMovies.peek()) > 0) {
@@ -329,7 +342,7 @@ public final class FilmQuery {
     }
     rs.close();
     prep.close();
-    assert bestMovies.size() <= max_num_results;
+    assert bestMovies.size() <= maxNumResults;
     output.addAll(bestMovies);
     Collections.reverse(output);
     return output;

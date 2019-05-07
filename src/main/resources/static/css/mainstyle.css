@@ -1,9 +1,14 @@
+.filmdb {
+	padding: 20px;
+}
+
 .outer {
   display: grid;
   position: absolute;
   top: 0;
   left: 0;
   height: 100%;
+  padding-top: 20px;
   width: 100%;
 }
 
@@ -45,15 +50,15 @@ body {
 .column1 {
     grid-row: 2;
     grid-column: 1 / 2;
-    width: 50%;
+    width: 80%;
     float: left;
 }
 
 .column2 {
     grid-row: 2;
     grid-column: 2 / 2;
-    width: 50%;
-    padding-left: 50%;
+    width: 20%;
+    padding-left: 80%;
 }
 
 .row:after{
@@ -85,6 +90,7 @@ body {
     border-radius: 50%;
     -webkit-animation: spin 1s linear infinite;
 }
+
 .style-2 .loading-wheel {
     border-style: double;
     border-color: #ccc transparent;
@@ -99,14 +105,25 @@ body {
     }
 }
 
+
+.suggestions-widget-table {
+	width: 100%
+}
+
+
 .suggestions-widget {
   cursor: pointer;
-  white-space: pre;
+  white-space: pre; 
   text-align: left;
   vertical-align: center;
   background: #DA70D6;
   border: 1px solid #9370DB;
   color: #333333;
+  width: 100%;
+}
+
+.suggestions-widget-td {
+	border: 1px;
 }
 
 .suggestions-widget .selected {
@@ -116,9 +133,10 @@ body {
   color: #9932CC
 }
 
+
 .film-widget {
   cursor: pointer;
-  white-space: pre;
+  white-space:pre;
   vertical-align: center;
   background: rgba(216,191,216,.7);
   border: 1px solid #9370DB;
@@ -126,9 +144,37 @@ body {
   color: #333333;
 }
 
+.film-widget-table {
+	vertical-align: center;
+}
+
+.film-widget-td-img {
+	align: center;
+	object-fit: contain;
+	width: 150px;
+	height: 150px;
+}
+
+.img {
+	align: center;
+	object-fit: contain;
+	width: 150px;
+	height: 150px;
+}
+
 .film-widget::before {
   border: 1px solid #9370DB;
   cursor: pointer;
+}
+
+.nested-film-widget {
+  cursor: pointer;
+  white-space: pre;
+  vertical-align: center;
+  background: rgba(217,233,255,.7);
+  border: 1px solid #9370DB;
+  text-align: left;
+  color: #333333;
 }
 
 .filmElem {
@@ -138,7 +184,6 @@ body {
 }
 
 .filmElem img {
-  width: 120px;
-  height: 120px;
+   display:block; width:100%; height:auto;
   overflow: hidden;
 }
