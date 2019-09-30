@@ -195,6 +195,7 @@ culling redundant data and titles, and dropping unnecessary tables.
 * Reorganizing data for faster querying.
 * Modifying region names from 2- and 3-letter codes to readable names for easier display.<br/>Concatenating
 regions together into a single column for using less space and improving search.
+* Unit testing for most of the code.
 
 ### Shuchi Agrawal: ###
 * Setting up the Command Manager and REPL. Setting up command classes that can run on the command manager.
